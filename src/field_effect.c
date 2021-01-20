@@ -3549,7 +3549,7 @@ static void FlyInEffect_7(struct Task * task)
     {
         objectEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
         state = PLAYER_AVATAR_STATE_NORMAL;
-        if (task->data[15] & PLAYER_AVATAR_STATE_SURFING)
+        if (task->data[15] & PLAYER_AVATAR_FLAG_SURFING)
         {
             state = PLAYER_AVATAR_STATE_SURFING;
             sub_80DC44C(objectEvent->fieldEffectSpriteId, 1);
