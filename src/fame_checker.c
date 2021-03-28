@@ -18,7 +18,6 @@
 #include "text_window.h"
 #include "fame_checker.h"
 #include "strings.h"
-#include "constants/trainers.h"
 
 #define SPRITETAG_SELECTOR_CURSOR 1000
 #define SPRITETAG_QUESTION_MARK 1001
@@ -429,7 +428,7 @@ void UseFameChecker(MainCallback savedCallback)
     sFameCheckerData->listMenuTopIdx2 = 0;
     sFameCheckerData->listMenuDrawnSelIdx = 0;
     sFameCheckerData->viewingFlavorText = FALSE;
-    PlaySE(SE_W129);
+    PlaySE(SE_M_SWIFT);
     SetMainCallback2(MainCB2_LoadFameChecker);
 }
 
@@ -451,7 +450,7 @@ static void MainCB2_LoadFameChecker(void)
             sBg1TilemapBuffer = AllocZeroed(0x1000);
             sBg2TilemapBuffer = AllocZeroed(0x800);
             ResetBgsAndClearDma3BusyFlags(0);
-            InitBgsFromTemplates(0, sUIBgTemplates, ARRAY_COUNT(sUIBgTemplates));
+            InitBgsFromTemplates(0, sUIBgTemplates, NELEMS(sUIBgTemplates));
             SetBgTilemapBuffer(3, sBg3TilemapBuffer);
             SetBgTilemapBuffer(2, sBg2TilemapBuffer);
             SetBgTilemapBuffer(1, sBg1TilemapBuffer);
@@ -540,11 +539,11 @@ static void Task_TopMenuHandleInput(u8 taskId)
             cursorPos = FameCheckerGetCursorY();
             if (TryExitPickMode(taskId) == TRUE)
             {
-                PlaySE(SE_W199);
+                PlaySE(SE_M_LOCK_ON);
             }
             else if (cursorPos != sFameCheckerData->numUnlockedPersons - 1) // anything but CANCEL
             {
-                PlaySE(SE_W199);
+                PlaySE(SE_M_LOCK_ON);
                 FillWindowPixelRect(FCWINDOWID_ICONDESC, 0x00, 0, 0, 88, 32);
                 FC_PutWindowTilemapAndCopyWindowToVramMode3(FCWINDOWID_ICONDESC);
                 UpdateInfoBoxTilemap(2, 4);
@@ -729,7 +728,7 @@ static void FC_MoveSelectorCursor(u8 taskId, s8 dx, s8 dy)
 {
     u8 i;
     s16 *data = gTasks[taskId].data;
-    PlaySE(SE_W207B);
+    PlaySE(SE_M_SWAGGER2);
     gSprites[data[0]].pos1.x += dx;
     gSprites[data[0]].pos1.y += dy;
     for (i = 0; i < 6; i++)
@@ -807,7 +806,7 @@ static bool8 SetMessageSelectorIconObjMode(u8 spriteId, u8 objMode)
 
 static void Task_StartToCloseFameChecker(u8 taskId)
 {
-    PlaySE(SE_W129);
+    PlaySE(SE_M_SWIFT);
     BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, 0);
     gTasks[taskId].func = Task_DestroyAssetsAndCloseFameChecker;
 }

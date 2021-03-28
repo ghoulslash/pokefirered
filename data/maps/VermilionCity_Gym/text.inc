@@ -7,7 +7,7 @@ VermilionCity_Gym_Text_LtSurgeIntro:: @ 8194BA4
     .string "saved me during the war!\p"
     .string "They zapped my enemies into\n"
     .string "paralysis!\p"
-    .string "The same as I'll do to you!{PLAY_BGM}{MUS_EXEYE}$"
+    .string "The same as I'll do to you!{PLAY_BGM}{MUS_ENCOUNTER_GYM_LEADER}$"
 
 VermilionCity_Gym_Text_LtSurgePostBattle:: @ 8194C8E
     .string "A little word of advice, kid!\p"
@@ -23,7 +23,7 @@ VermilionCity_Gym_Text_ExplainThunderBadgeTakeThis:: @ 8194CFA
     .string "You're special, kid!\n"
     .string "Take this!$"
 
-VermilionCity_Gym_Text_ReceivedTM43FromLtSurge:: @ 8194D87
+VermilionCity_Gym_Text_ReceivedTM34FromLtSurge:: @ 8194D87
     .string "{PLAYER} received TM34\n"
     .string "from LT. SURGE.$"
 

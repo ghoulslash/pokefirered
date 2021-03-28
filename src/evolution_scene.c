@@ -23,7 +23,6 @@
 #include "text_window.h"
 #include "trig.h"
 #include "battle_string_ids.h"
-#include "constants/species.h"
 #include "constants/songs.h"
 #include "constants/pokemon.h"
 
@@ -558,7 +557,7 @@ static void CreateShedinja(u16 preEvoSpecies, struct Pokemon* mon)
 
         for (i = MON_DATA_COOL_RIBBON; i < MON_DATA_COOL_RIBBON + 5; i++)
             SetMonData(&gPlayerParty[gPlayerPartyCount], i, (&data));
-        for (i = MON_DATA_CHAMPION_RIBBON; i <= MON_DATA_FATEFUL_ENCOUNTER; i++)
+        for (i = MON_DATA_CHAMPION_RIBBON; i <= MON_DATA_FILLER; i++)
             SetMonData(&gPlayerParty[gPlayerPartyCount], i, (&data));
 
         SetMonData(&gPlayerParty[gPlayerPartyCount], MON_DATA_STATUS, (&data));
@@ -641,14 +640,14 @@ static void Task_EvolutionScene(u8 taskId)
     case 3:
         if (IsCryFinished()) // wait for animation, play tu du SE
         {
-            PlaySE(MUS_ME_SHINKA);
+            PlaySE(MUS_EVOLUTION_INTRO);
             gTasks[taskId].tState++;
         }
         break;
     case 4: // play evolution music and fade screen black
         if (!IsSEPlaying())
         {
-            PlayNewMapMusic(MUS_SHINKA);
+            PlayNewMapMusic(MUS_EVOLUTION);
             gTasks[taskId].tState++;
             BeginNormalPaletteFade(0x1C, 4, 0, 0x10, RGB_BLACK);
         }
@@ -724,7 +723,7 @@ static void Task_EvolutionScene(u8 taskId)
         {
             StringExpandPlaceholders(gStringVar4, gText_CongratsPkmnEvolved);
             BattlePutTextOnWindow(gStringVar4, 0);
-            PlayBGM(MUS_FANFA5);
+            PlayBGM(MUS_EVOLVED);
             gTasks[taskId].tState++;
             SetMonData(mon, MON_DATA_SPECIES, (void*)(&gTasks[taskId].tPostEvoSpecies));
             CalculateMonStats(mon);
@@ -816,7 +815,7 @@ static void Task_EvolutionScene(u8 taskId)
         if (!IsTextPrinterActive(0) && !IsSEPlaying())
         {
             BufferMoveToLearnIntoBattleTextBuff2();
-            PlayFanfare(MUS_FANFA1);
+            PlayFanfare(MUS_LEVEL_UP);
             BattleStringExpandPlaceholdersToDisplayedString(gBattleStringsTable[STRINGID_PKMNLEARNEDMOVE - BATTLESTRINGS_ID_ADDER]);
             BattlePutTextOnWindow(gDisplayedStringBattle, 0);
             gTasks[taskId].tLearnsFirstMove = 0x40; // re-used as a counter
@@ -1021,15 +1020,15 @@ static void Task_TradeEvolutionScene(u8 taskId)
     case 2:
         if (IsCryFinished())
         {
-            m4aSongNumStop(MUS_SHINKA);
-            PlaySE(MUS_ME_SHINKA);
+            m4aSongNumStop(MUS_EVOLUTION);
+            PlaySE(MUS_EVOLUTION_INTRO);
             gTasks[taskId].tState++;
         }
         break;
     case 3:
         if (!IsSEPlaying())
         {
-            PlayBGM(MUS_SHINKA);
+            PlayBGM(MUS_EVOLUTION);
             gTasks[taskId].tState++;
             BeginNormalPaletteFade(0x1C, 4, 0, 0x10, RGB_BLACK);
         }
@@ -1103,7 +1102,7 @@ static void Task_TradeEvolutionScene(u8 taskId)
         {
             StringExpandPlaceholders(gStringVar4, gText_CongratsPkmnEvolved);
             DrawTextOnTradeWindow(0, gStringVar4, 1);
-            PlayFanfare(MUS_FANFA5);
+            PlayFanfare(MUS_EVOLVED);
             gTasks[taskId].tState++;
             SetMonData(mon, MON_DATA_SPECIES, (&gTasks[taskId].tPostEvoSpecies));
             CalculateMonStats(mon);
@@ -1136,7 +1135,7 @@ static void Task_TradeEvolutionScene(u8 taskId)
             }
             else
             {
-                PlayBGM(MUS_SHINKA);
+                PlayBGM(MUS_EVOLUTION);
                 DrawTextOnTradeWindow(0, gText_CommunicationStandby5, 1);
                 gTasks[taskId].tState++;
             }
@@ -1180,7 +1179,7 @@ static void Task_TradeEvolutionScene(u8 taskId)
         if (!IsTextPrinterActive(0) && !IsSEPlaying())
         {
             BufferMoveToLearnIntoBattleTextBuff2();
-            PlayFanfare(MUS_FANFA1);
+            PlayFanfare(MUS_LEVEL_UP);
             BattleStringExpandPlaceholdersToDisplayedString(gBattleStringsTable[STRINGID_PKMNLEARNEDMOVE - BATTLESTRINGS_ID_ADDER]);
             DrawTextOnTradeWindow(0, gDisplayedStringBattle, 1);
             gTasks[taskId].tLearnsFirstMove = 0x40; // re-used as a counter

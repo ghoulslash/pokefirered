@@ -19,11 +19,9 @@
 #include "save.h"
 #include "item.h"
 #include "script_pokemon_util.h"
-#include "constants/species.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/pokemon.h"
-#include "constants/vars.h"
 #include "constants/event_objects.h"
 
 static EWRAM_DATA u16 sSpecialVar_0x8004_Copy = 0;
@@ -1126,7 +1124,8 @@ static void SetPlayerBattleTowerRecord(void)
         playerRecord->greeting[i] = gSaveBlock1Ptr->easyChatBattleStart[i];
 
     for (i = 0; i < 3; i++)
-        sub_803E23C(&gPlayerParty[gSaveBlock2Ptr->battleTower.selectedPartyMons[i] - 1], &playerRecord->party[i]);
+        ConvertPokemonToBattleTowerPokemon(&gPlayerParty[gSaveBlock2Ptr->battleTower.selectedPartyMons[i] - 1],
+                                           &playerRecord->party[i]);
 
     SetBattleTowerRecordChecksum(&gSaveBlock2Ptr->battleTower.playerRecord);
     SaveCurrentWinStreak();
@@ -1322,7 +1321,7 @@ static void Debug_FillEReaderTrainerWithPlayerData(void)
     }
 
     for (i = 0; i < 3; i++)
-        sub_803E23C(&gPlayerParty[i], &ereaderTrainer->party[i]);
+        ConvertPokemonToBattleTowerPokemon(&gPlayerParty[i], &ereaderTrainer->party[i]);
 
     SetEReaderTrainerChecksum(ereaderTrainer);
 }

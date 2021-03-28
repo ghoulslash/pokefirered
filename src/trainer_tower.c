@@ -12,12 +12,9 @@
 #include "item.h"
 #include "menu.h"
 #include "new_menu_helpers.h"
-#include "constants/vars.h"
 #include "constants/items.h"
-#include "constants/species.h"
 #include "constants/songs.h"
 #include "constants/layouts.h"
-#include "constants/trainers.h"
 #include "constants/facility_trainer_classes.h"
 #include "constants/event_objects.h"
 #include "constants/trainer_tower.h"
@@ -376,20 +373,20 @@ static const u16 sPrizeList[] = {
 };
 
 static const u16 sTrainerTowerEncounterMusic[] = {
-    [TRAINER_ENCOUNTER_MUSIC_MALE]        = MUS_SHOUNEN,
-    [TRAINER_ENCOUNTER_MUSIC_FEMALE]      = MUS_SHOUJO,
-    [TRAINER_ENCOUNTER_MUSIC_GIRL]        = MUS_SHOUJO,
-    [TRAINER_ENCOUNTER_MUSIC_SUSPICIOUS]  = MUS_ROCKET,
-    [TRAINER_ENCOUNTER_MUSIC_INTENSE]     = MUS_SHOUNEN,
-    [TRAINER_ENCOUNTER_MUSIC_COOL]        = MUS_SHOUNEN,
-    [TRAINER_ENCOUNTER_MUSIC_AQUA]        = MUS_ROCKET,
-    [TRAINER_ENCOUNTER_MUSIC_MAGMA]       = MUS_ROCKET,
-    [TRAINER_ENCOUNTER_MUSIC_SWIMMER]     = MUS_SHOUNEN,
-    [TRAINER_ENCOUNTER_MUSIC_TWINS]       = MUS_SHOUJO,
-    [TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR]  = MUS_SHOUNEN,
-    [TRAINER_ENCOUNTER_MUSIC_HIKER]       = MUS_SHOUNEN,
-    [TRAINER_ENCOUNTER_MUSIC_INTERVIEWER] = MUS_SHOUNEN,
-    [TRAINER_ENCOUNTER_MUSIC_RICH]        = MUS_SHOUNEN
+    [TRAINER_ENCOUNTER_MUSIC_MALE]        = MUS_ENCOUNTER_BOY,
+    [TRAINER_ENCOUNTER_MUSIC_FEMALE]      = MUS_ENCOUNTER_GIRL,
+    [TRAINER_ENCOUNTER_MUSIC_GIRL]        = MUS_ENCOUNTER_GIRL,
+    [TRAINER_ENCOUNTER_MUSIC_SUSPICIOUS]  = MUS_ENCOUNTER_ROCKET,
+    [TRAINER_ENCOUNTER_MUSIC_INTENSE]     = MUS_ENCOUNTER_BOY,
+    [TRAINER_ENCOUNTER_MUSIC_COOL]        = MUS_ENCOUNTER_BOY,
+    [TRAINER_ENCOUNTER_MUSIC_AQUA]        = MUS_ENCOUNTER_ROCKET,
+    [TRAINER_ENCOUNTER_MUSIC_MAGMA]       = MUS_ENCOUNTER_ROCKET,
+    [TRAINER_ENCOUNTER_MUSIC_SWIMMER]     = MUS_ENCOUNTER_BOY,
+    [TRAINER_ENCOUNTER_MUSIC_TWINS]       = MUS_ENCOUNTER_GIRL,
+    [TRAINER_ENCOUNTER_MUSIC_ELITE_FOUR]  = MUS_ENCOUNTER_BOY,
+    [TRAINER_ENCOUNTER_MUSIC_HIKER]       = MUS_ENCOUNTER_BOY,
+    [TRAINER_ENCOUNTER_MUSIC_INTERVIEWER] = MUS_ENCOUNTER_BOY,
+    [TRAINER_ENCOUNTER_MUSIC_RICH]        = MUS_ENCOUNTER_BOY
 };
 
 static const u8 sSingleBattleChallengeMonIdxs[][2] = {
@@ -511,7 +508,7 @@ static void SetUpTrainerTowerDataStruct(void) // fakematching
     const struct TrainerTowerFloor *const * r7;
 
     sTrainerTowerState = AllocZeroed(sizeof(*sTrainerTowerState));
-    sTrainerTowerState->floorIdx = gMapHeader.mapLayoutId - 42;
+    sTrainerTowerState->floorIdx = gMapHeader.mapLayoutId - LAYOUT_TRAINER_TOWER_1F;
     if (ReadTrainerTowerAndValidate() == TRUE)
         CEReaderTool_LoadTrainerTower(&sTrainerTowerState->unk_0004);
     else

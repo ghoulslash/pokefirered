@@ -5,7 +5,6 @@
 #include "pokedex.h"
 #include "text.h"
 #include "strings.h"
-#include "constants/species.h"
 
 #define DEFAULT_MAX_SIZE 0 // was 0x8100 in Ruby/Sapphire, 0x8000 in Emerald
 
@@ -38,9 +37,9 @@ static const struct UnknownStruct sBigMonSizeTable[] =
 
 static const u8 sGiftRibbonsMonDataIds[] =
 {
-    MON_DATA_GIFT_RIBBON_1, MON_DATA_GIFT_RIBBON_2, MON_DATA_GIFT_RIBBON_3,
-    MON_DATA_GIFT_RIBBON_4, MON_DATA_GIFT_RIBBON_5, MON_DATA_GIFT_RIBBON_6,
-    MON_DATA_GIFT_RIBBON_7
+    MON_DATA_MARINE_RIBBON, MON_DATA_LAND_RIBBON, MON_DATA_SKY_RIBBON,
+    MON_DATA_COUNTRY_RIBBON, MON_DATA_NATIONAL_RIBBON, MON_DATA_EARTH_RIBBON,
+    MON_DATA_WORLD_RIBBON
 };
 
 #define CM_PER_INCH 2.54

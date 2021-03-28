@@ -377,7 +377,7 @@ static void CB2_OpenBagMenu(void)
 {
     while (1)
     {
-        if ((u8)MenuHelpers_CallLinkSomething() == TRUE)
+        if (MenuHelpers_CallLinkSomething() == TRUE)
             break;
         if (LoadBagMenuGraphics() == TRUE)
             break;
@@ -683,7 +683,7 @@ static void BagListMenuMoveCursorFunc(s32 itemIndex, bool8 onInit, struct ListMe
 {
     if (onInit != TRUE)
     {
-        PlaySE(SE_BAG1);
+        PlaySE(SE_BAG_CURSOR);
         sub_8098580();
     }
     if (sBagMenuDisplay->itemOriginalLocation == 0xFF)
@@ -1050,7 +1050,7 @@ static void Task_BagMenu_HandleInput(u8 taskId)
         return;
     if (FuncIsActiveTask(Task_AnimateWin0v) == TRUE)
         return;
-    if ((u8)MenuHelpers_CallLinkSomething() == TRUE)
+    if (MenuHelpers_CallLinkSomething() == TRUE)
         return;
     switch (ProcessPocketSwitchInput(taskId, gBagMenuState.pocket))
     {
@@ -1136,14 +1136,14 @@ static u8 ProcessPocketSwitchInput(u8 taskId, u8 pocketId)
     {
         if (pocketId == POCKET_ITEMS - 1)
             return 0;
-        PlaySE(SE_BAG2);
+        PlaySE(SE_BAG_POCKET);
         return 1;
     }
     if (JOY_NEW(DPAD_RIGHT) || lrState == 2)
     {
         if (pocketId >= POCKET_POKE_BALLS - 1)
             return 0;
-        PlaySE(SE_BAG2);
+        PlaySE(SE_BAG_POCKET);
         return 2;
     }
     return 0;
@@ -1244,7 +1244,7 @@ static void Task_MoveItemInPocket_HandleInput(u8 taskId)
     s32 input;
     u16 itemsAbove;
     u16 cursorPos;
-    if ((u8)MenuHelpers_CallLinkSomething() == TRUE)
+    if (MenuHelpers_CallLinkSomething() == TRUE)
         return;
     input = ListMenu_ProcessInput(data[0]);
     ListMenuGetScrollAndRow(data[0], &gBagMenuState.cursorPos[gBagMenuState.pocket], &gBagMenuState.itemsAbove[gBagMenuState.pocket]);
@@ -1447,7 +1447,7 @@ static void Task_ItemContext_FieldOrBattle(u8 taskId)
 static void Task_FieldItemContextMenuHandleInput(u8 taskId)
 {
     s8 input;
-    if ((u8)MenuHelpers_CallLinkSomething() != TRUE)
+    if (MenuHelpers_CallLinkSomething() != TRUE)
     {
         input = Menu_ProcessInputNoWrapAround();
         switch (input)
@@ -2115,7 +2115,7 @@ static void Task_Bag_OldManTutorial(u8 taskId)
         {
         case 102:
         case 204:
-            PlaySE(SE_BAG2);
+            PlaySE(SE_BAG_POCKET);
             SwitchPockets(taskId, 1, FALSE);
             break;
         case 306:
@@ -2216,7 +2216,7 @@ static void Task_Bag_TeachyTvRegister(u8 taskId)
         switch (data[8])
         {
         case 102:
-            PlaySE(SE_BAG2);
+            PlaySE(SE_BAG_POCKET);
             SwitchPockets(taskId, 1, FALSE);
             break;
         case 204:
@@ -2277,7 +2277,7 @@ static void Task_Bag_TeachyTvCatching(u8 taskId)
         {
         case 102:
         case 204:
-            PlaySE(SE_BAG2);
+            PlaySE(SE_BAG_POCKET);
             SwitchPockets(taskId, 1, FALSE);
             break;
         case 306:
@@ -2351,7 +2351,7 @@ static void Task_Bag_TeachyTvStatus(u8 taskId)
             DestroyListMenuTask(data[0], NULL, NULL);
             RestorePlayerBag();
             gItemUseCB = ItemUseCB_MedicineStep;
-            ItemMenu_SetExitCallback(ChooseMonForInBattleItem);
+            ItemMenu_SetExitCallback(Pokedude_ChooseMonForInBattleItem);
             gTasks[taskId].func = Task_Pokedude_FadeFromBag;
             return;
         }
@@ -2367,7 +2367,7 @@ static void Task_Bag_TeachyTvTMs(u8 taskId)
         switch (data[8])
         {
         case 102:
-            PlaySE(SE_BAG2);
+            PlaySE(SE_BAG_POCKET);
             SwitchPockets(taskId, 1, 0);
             break;
         case 204:

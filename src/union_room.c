@@ -45,7 +45,6 @@
 #include "constants/maps.h"
 #include "constants/cable_club.h"
 #include "constants/field_weather.h"
-#include "constants/species.h"
 #include "constants/trainer_card.h"
 #include "constants/union_room.h"
 
@@ -1351,14 +1350,14 @@ static void Task_TryJoinLinkGroup(u8 taskId)
                     {
                         AskToJoinRfuGroup(data, id);
                         data->state = 5;
-                        PlaySE(SE_PN_ON);
+                        PlaySE(SE_POKENAV_ON);
                     }
                     else
                     {
                         // Postgame flags not both set
                         StringCopy(gStringVar4, gUnknown_8457608[var - 1]);
                         data->state = 18;
-                        PlaySE(SE_PN_ON);
+                        PlaySE(SE_POKENAV_ON);
                     }
                 }
                 else
@@ -2023,7 +2022,7 @@ static void Task_RunScriptAndFadeToActivity(u8 taskId)
     case 2:
         if (!gPaletteFade.active)
         {
-            PrepareSendLinkCmd2FFE_or_RfuCmd6600();
+            SetLinkStandbyCallback();
             data[0]++;
         }
         break;
@@ -2247,7 +2246,7 @@ static void Task_MEvent_Leader(u8 taskId)
         Free(data->field_8);
         Free(data->field_0);
         Free(data->field_4);
-        PrepareSendLinkCmd2FFE_or_RfuCmd6600();
+        SetLinkStandbyCallback();
         data->state++;
         break;
     case 17:
@@ -2344,7 +2343,7 @@ static void Task_CardOrNewsWithFriend(u8 taskId)
                     RedrawListMenu(data->listTaskId);
                     IntlConvPartnerUname(gStringVar1, data->field_0->arr[data->leaderId]);
                     CreateTask_RfuReconnectWithParent(data->field_0->arr[data->leaderId].gname_uname.uname, ReadAsU16(data->field_0->arr[data->leaderId].gname_uname.gname.unk_00.playerTrainerId));
-                    PlaySE(SE_PN_ON);
+                    PlaySE(SE_POKENAV_ON);
                     data->state = 4;
                 }
                 else
@@ -2414,7 +2413,7 @@ static void Task_CardOrNewsWithFriend(u8 taskId)
         break;
     case 11:
         data->state++;
-        PrepareSendLinkCmd2FFE_or_RfuCmd6600();
+        SetLinkStandbyCallback();
         break;
     case 12:
         if (IsLinkTaskFinished())
@@ -2505,7 +2504,7 @@ static void Task_CardOrNewsOverWireless(u8 taskId)
                         LoadWirelessStatusIndicatorSpriteGfx();
                         CreateWirelessStatusIndicatorSprite(0, 0);
                         CreateTask_RfuReconnectWithParent(data->field_0->arr[0].gname_uname.uname, ReadAsU16(data->field_0->arr[0].gname_uname.gname.unk_00.playerTrainerId));
-                        PlaySE(SE_PN_ON);
+                        PlaySE(SE_POKENAV_ON);
                         data->state = 4;
                     }
                     else
@@ -2593,7 +2592,7 @@ static void Task_CardOrNewsOverWireless(u8 taskId)
         break;
     case 13:
         data->state++;
-        PrepareSendLinkCmd2FFE_or_RfuCmd6600();
+        SetLinkStandbyCallback();
         break;
     case 14:
         if (IsLinkTaskFinished())
@@ -2796,7 +2795,7 @@ static void Task_RunUnionRoom(u8 taskId)
             switch (HandlePlayerListUpdate())
             {
             case 1:
-                PlaySE(SE_TOY_C);
+                PlaySE(SE_NOTE_C);
             case 2:
                 ScheduleUnionRoomPlayerRefresh(data);
                 break;
@@ -2936,7 +2935,7 @@ static void Task_RunUnionRoom(u8 taskId)
         }
         break;
     case 32:
-        Link_TryStartSend5FFF();
+        SetCloseLinkCallback();
         data->state = 36;
         break;
     case 31:
@@ -2985,7 +2984,7 @@ static void Task_RunUnionRoom(u8 taskId)
         if (PrintOnTextbox(&data->textState, gStringVar4))
         {
             data->state = 41;
-            PrepareSendLinkCmd2FFE_or_RfuCmd6600();
+            SetLinkStandbyCallback();
             data->partnerYesNoResponse = 0;
             data->recvActivityRequest[0] = 0;
         }
@@ -3068,7 +3067,7 @@ static void Task_RunUnionRoom(u8 taskId)
             data->state = 16;
         break;
     case 11:
-        PlaySE(SE_PINPON);
+        PlaySE(SE_DING_DONG);
         sub_80F8FA0();
         data->state = 12;
         data->recvActivityRequest[0] = 0;
@@ -3163,7 +3162,7 @@ static void Task_RunUnionRoom(u8 taskId)
         }
         break;
     case 10:
-        Link_TryStartSend5FFF();
+        SetCloseLinkCallback();
         data->state = 36;
         break;
     case 36:
@@ -3186,7 +3185,7 @@ static void Task_RunUnionRoom(u8 taskId)
         UnionRoom_ScheduleFieldMessageWithFollowupState(14, gStringVar4);
         break;
     case 14:
-        PrepareSendLinkCmd2FFE_or_RfuCmd6600();
+        SetLinkStandbyCallback();
         data->state = 15;
         break;
     case 15:
@@ -3448,7 +3447,7 @@ static bool32 UnionRoom_HandleContactFromOtherPlayer(struct UnkStruct_URoom * ur
         else if (var == 2)
         {
             uroom->state = 36;
-            Link_TryStartSend5FFF();
+            SetCloseLinkCallback();
             return FALSE;
         }
     }
@@ -4690,7 +4689,7 @@ static void ViewURoomPartnerTrainerCard(u8 *unused, struct UnkStruct_URoom * uro
 
     DynamicPlaceholderTextUtil_Reset();
 
-    StringCopy(uroom->trainerCardStrbufs[0], gTrainerClassNames[sub_80447F0()]);
+    StringCopy(uroom->trainerCardStrbufs[0], gTrainerClassNames[GetUnionRoomTrainerClass()]);
     DynamicPlaceholderTextUtil_SetPlaceholderPtr(0, uroom->trainerCardStrbufs[0]);
 
     DynamicPlaceholderTextUtil_SetPlaceholderPtr(1, trainerCard->rse.playerName);

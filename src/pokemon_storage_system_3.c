@@ -25,8 +25,6 @@
 #include "constants/items.h"
 #include "constants/help_system.h"
 #include "constants/songs.h"
-#include "constants/flags.h"
-#include "constants/vars.h"
 
 EWRAM_DATA struct PokemonStorageSystemData *gPSSData = NULL;
 static EWRAM_DATA bool8 sInPartyMenu = 0;
@@ -769,7 +767,7 @@ static void Cb_MainPSS(u8 taskId)
             gPSSData->state = 7;
             break;
         case 24:
-            PlaySE(SE_HAZURE);
+            PlaySE(SE_FAILURE);
             break;
         }
         break;
@@ -815,12 +813,12 @@ static void Cb_MainPSS(u8 taskId)
         }
         break;
     case 4:
-        PlaySE(SE_HAZURE);
+        PlaySE(SE_FAILURE);
         PrintStorageActionText(PC_TEXT_LAST_POKE);
         gPSSData->state = 6;
         break;
     case 5:
-        PlaySE(SE_HAZURE);
+        PlaySE(SE_FAILURE);
         PrintStorageActionText(PC_TEXT_PLEASE_REMOVE_MAIL);
         gPSSData->state = 6;
         break;
@@ -1034,17 +1032,17 @@ static void Cb_OnSelectedMon(u8 taskId)
         }
         break;
     case 3:
-        PlaySE(SE_HAZURE);
+        PlaySE(SE_FAILURE);
         PrintStorageActionText(PC_TEXT_LAST_POKE);
         gPSSData->state = 6;
         break;
     case 5:
-        PlaySE(SE_HAZURE);
+        PlaySE(SE_FAILURE);
         PrintStorageActionText(PC_TEXT_CANT_RELEASE_EGG);
         gPSSData->state = 6;
         break;
     case 4:
-        PlaySE(SE_HAZURE);
+        PlaySE(SE_FAILURE);
         PrintStorageActionText(PC_TEXT_PLEASE_REMOVE_MAIL);
         gPSSData->state = 6;
         break;
@@ -1472,7 +1470,7 @@ static void Cb_ItemToBag(u8 taskId)
     case 0:
         if (!AddBagItem(gPSSData->cursorMonItem, 1))
         {
-            PlaySE(SE_HAZURE);
+            PlaySE(SE_FAILURE);
             PrintStorageActionText(PC_TEXT_BAG_FULL);
             gPSSData->state = 3;
         }
@@ -1922,7 +1920,7 @@ static void Cb_OnCloseBoxPressed(u8 taskId)
     case 0:
         if (IsMonBeingMoved())
         {
-            PlaySE(SE_HAZURE);
+            PlaySE(SE_FAILURE);
             PrintStorageActionText(PC_TEXT_HOLDING_POKE);
             gPSSData->state = 1;
         }
@@ -1983,7 +1981,7 @@ static void Cb_OnBPressed(u8 taskId)
     case 0:
         if (IsMonBeingMoved())
         {
-            PlaySE(SE_HAZURE);
+            PlaySE(SE_FAILURE);
             PrintStorageActionText(PC_TEXT_HOLDING_POKE);
             gPSSData->state = 1;
         }

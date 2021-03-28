@@ -27,13 +27,10 @@
 #include "battle_transition.h"
 #include "battle_controllers.h"
 #include "constants/battle_setup.h"
-#include "constants/flags.h"
 #include "constants/items.h"
 #include "constants/maps.h"
 #include "constants/songs.h"
-#include "constants/species.h"
 #include "constants/pokemon.h"
-#include "constants/trainers.h"
 #include "constants/trainer_classes.h"
 
 enum
@@ -79,18 +76,18 @@ static EWRAM_DATA u16 sRivalBattleFlags = 0;
 
 static const u8 sBattleTransitionTable_Wild[][2] =
 {
-    B_TRANSITION_SLICED_SCREEN, B_TRANSITION_WHITEFADE_IN_STRIPES,
-    B_TRANSITION_CLOCKWISE_BLACKFADE, B_TRANSITION_GRID_SQUARES,
-    B_TRANSITION_BLUR, B_TRANSITION_GRID_SQUARES,
-    B_TRANSITION_BLACK_WAVE_TO_RIGHT, B_TRANSITION_FULLSCREEN_WAVE,
+    { B_TRANSITION_SLICED_SCREEN,        B_TRANSITION_WHITEFADE_IN_STRIPES },
+    { B_TRANSITION_CLOCKWISE_BLACKFADE,  B_TRANSITION_GRID_SQUARES         },
+    { B_TRANSITION_BLUR,                 B_TRANSITION_GRID_SQUARES         },
+    { B_TRANSITION_BLACK_WAVE_TO_RIGHT,  B_TRANSITION_FULLSCREEN_WAVE      },
 };
 
 static const u8 sBattleTransitionTable_Trainer[][2] =
 {
-    B_TRANSITION_SLIDING_POKEBALLS, B_TRANSITION_BLACK_DOODLES,
-    B_TRANSITION_HORIZONTAL_CORRUGATE, B_TRANSITION_BIG_POKEBALL,
-    B_TRANSITION_BLUR, B_TRANSITION_GRID_SQUARES,
-    B_TRANSITION_DISTORTED_WAVE, B_TRANSITION_FULLSCREEN_WAVE,
+    { B_TRANSITION_SLIDING_POKEBALLS,    B_TRANSITION_BLACK_DOODLES        },
+    { B_TRANSITION_HORIZONTAL_CORRUGATE, B_TRANSITION_BIG_POKEBALL         },
+    { B_TRANSITION_BLUR,                 B_TRANSITION_GRID_SQUARES         },
+    { B_TRANSITION_DISTORTED_WAVE,       B_TRANSITION_FULLSCREEN_WAVE      },
 };
 
 static const struct TrainerBattleParameter sOrdinaryBattleParams[] =
@@ -250,7 +247,7 @@ void StartRoamerBattle(void)
     StopPlayerAvatar();
     gMain.savedCallback = CB2_EndWildBattle;
     gBattleTypeFlags = BATTLE_TYPE_ROAMER;
-    CreateBattleStartTask(GetWildBattleTransition(), MUS_VS_DEN);
+    CreateBattleStartTask(GetWildBattleTransition(), MUS_VS_LEGEND);
     IncrementGameStat(GAME_STAT_TOTAL_BATTLES);
     IncrementGameStat(GAME_STAT_WILD_BATTLES);
 }
@@ -344,20 +341,20 @@ void StartLegendaryBattle(void)
     switch (species)
     {
     case SPECIES_MEWTWO:
-        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_VS_MYU2);
+        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_VS_MEWTWO);
         break;
     case SPECIES_DEOXYS:
-        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_VS_DEO);
+        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_VS_DEOXYS);
         break;
     case SPECIES_MOLTRES:
     case SPECIES_ARTICUNO:
     case SPECIES_ZAPDOS:
     case SPECIES_HO_OH:
     case SPECIES_LUGIA:
-        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_VS_DEN);
+        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_VS_LEGEND);
         break;
     default:
-        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_BATTLE20);
+        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_RS_VS_TRAINER);
         break;
     }
     IncrementGameStat(GAME_STAT_TOTAL_BATTLES);
@@ -370,9 +367,9 @@ void StartGroudonKyogreBattle(void)
     gMain.savedCallback = CB2_EndScriptedWildBattle;
     gBattleTypeFlags = BATTLE_TYPE_LEGENDARY | BATTLE_TYPE_KYOGRE_GROUDON;
     if (gGameVersion == VERSION_FIRE_RED)
-        CreateBattleStartTask(B_TRANSITION_BLACK_DOODLES, MUS_BATTLE20);
+        CreateBattleStartTask(B_TRANSITION_BLACK_DOODLES, MUS_RS_VS_TRAINER);
     else // pointless, exactly the same
-        CreateBattleStartTask(B_TRANSITION_BLACK_DOODLES, MUS_BATTLE20);
+        CreateBattleStartTask(B_TRANSITION_BLACK_DOODLES, MUS_RS_VS_TRAINER);
     IncrementGameStat(GAME_STAT_TOTAL_BATTLES);
     IncrementGameStat(GAME_STAT_WILD_BATTLES);
 }
@@ -382,7 +379,7 @@ void StartRegiBattle(void)
     ScriptContext2_Enable();
     gMain.savedCallback = CB2_EndScriptedWildBattle;
     gBattleTypeFlags = BATTLE_TYPE_LEGENDARY | BATTLE_TYPE_REGI;
-    CreateBattleStartTask(B_TRANSITION_BLUR, MUS_BATTLE20);
+    CreateBattleStartTask(B_TRANSITION_BLUR, MUS_RS_VS_TRAINER);
     IncrementGameStat(GAME_STAT_TOTAL_BATTLES);
     IncrementGameStat(GAME_STAT_WILD_BATTLES);
 }
@@ -649,9 +646,9 @@ u8 BattleSetup_GetBattleTowerBattleTransition(void)
     u8 playerLevel = GetSumOfPlayerPartyLevel(1);
 
     if (enemyLevel < playerLevel)
-        return 4;
+        return B_TRANSITION_SLIDING_POKEBALLS;
     else
-        return 3;
+        return B_TRANSITION_BIG_POKEBALL;
 }
 
 static u32 TrainerBattleLoadArg32(const u8 *ptr)
@@ -671,7 +668,7 @@ static u8 TrainerBattleLoadArg8(const u8 *ptr)
 
 static u16 GetTrainerAFlag(void)
 {
-    return FLAG_TRAINER_FLAG_START + gTrainerBattleOpponent_A;
+    return TRAINER_FLAGS_START + gTrainerBattleOpponent_A;
 }
 
 static bool32 IsPlayerDefeated(u32 battleOutcome)
@@ -828,7 +825,7 @@ bool32 GetTrainerFlagFromScriptPointer(const u8 *data)
 {
     u32 flag = TrainerBattleLoadArg16(data + 2);
 
-    return FlagGet(FLAG_TRAINER_FLAG_START + flag);
+    return FlagGet(TRAINER_FLAGS_START + flag);
 }
 
 void SetUpTrainerMovement(void)
@@ -866,17 +863,17 @@ static void SetBattledTrainerFlag2(void)
 
 bool8 HasTrainerBeenFought(u16 trainerId)
 {
-    return FlagGet(FLAG_TRAINER_FLAG_START + trainerId);
+    return FlagGet(TRAINER_FLAGS_START + trainerId);
 }
 
 void SetTrainerFlag(u16 trainerId)
 {
-    FlagSet(FLAG_TRAINER_FLAG_START + trainerId);
+    FlagSet(TRAINER_FLAGS_START + trainerId);
 }
 
 void ClearTrainerFlag(u16 trainerId)
 {
-    FlagClear(FLAG_TRAINER_FLAG_START + trainerId);
+    FlagClear(TRAINER_FLAGS_START + trainerId);
 }
 
 void StartTrainerBattle(void)
@@ -907,14 +904,14 @@ static void CB2_EndTrainerBattle(void)
             }
             SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
             SetBattledTrainerFlag();
-            sub_81139BC();
+            QuestLogEvents_HandleEndTrainerBattle();
         }
         else
         {
             gSpecialVar_Result = FALSE;
             SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
             SetBattledTrainerFlag();
-            sub_81139BC();
+            QuestLogEvents_HandleEndTrainerBattle();
         }
 
     }
@@ -932,7 +929,7 @@ static void CB2_EndTrainerBattle(void)
         {
             SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
             SetBattledTrainerFlag();
-            sub_81139BC();
+            QuestLogEvents_HandleEndTrainerBattle();
         }
     }
 }
@@ -1003,7 +1000,7 @@ void PlayTrainerEncounterMusic(void)
         case TRAINER_ENCOUNTER_MUSIC_FEMALE:
         case TRAINER_ENCOUNTER_MUSIC_GIRL:
         case TRAINER_ENCOUNTER_MUSIC_TWINS:
-            music = MUS_SHOUJO;
+            music = MUS_ENCOUNTER_GIRL;
             break;
         case TRAINER_ENCOUNTER_MUSIC_MALE:
         case TRAINER_ENCOUNTER_MUSIC_INTENSE:
@@ -1013,10 +1010,10 @@ void PlayTrainerEncounterMusic(void)
         case TRAINER_ENCOUNTER_MUSIC_HIKER:
         case TRAINER_ENCOUNTER_MUSIC_INTERVIEWER:
         case TRAINER_ENCOUNTER_MUSIC_RICH:
-            music = MUS_SHOUNEN;
+            music = MUS_ENCOUNTER_BOY;
             break;
         default:
-            music = MUS_ROCKET;
+            music = MUS_ENCOUNTER_ROCKET;
             break;
         }
         PlayNewMapMusic(music);

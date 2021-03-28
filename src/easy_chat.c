@@ -11,8 +11,6 @@
 #include "random.h"
 #include "strings.h"
 #include "constants/easy_chat.h"
-#include "constants/flags.h"
-#include "constants/species.h"
 
 struct Unk203A120
 {
@@ -706,7 +704,7 @@ static bool8 UnlockedECMonOrMove(u16 wordIndex, u8 groupId)
 static bool32 EC_IsDeoxys(u16 species)
 {
     u32 i;
-    for (i = 0; i < ARRAY_COUNT(sDeoxysValue); i++)
+    for (i = 0; i < NELEMS(sDeoxysValue); i++)
     {
         if (sDeoxysValue[i] == species)
             return TRUE;

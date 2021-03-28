@@ -74,15 +74,15 @@
 #define MON_DATA_VICTORY_RIBBON    69
 #define MON_DATA_ARTIST_RIBBON     70
 #define MON_DATA_EFFORT_RIBBON     71
-#define MON_DATA_GIFT_RIBBON_1     72
-#define MON_DATA_GIFT_RIBBON_2     73
-#define MON_DATA_GIFT_RIBBON_3     74
-#define MON_DATA_GIFT_RIBBON_4     75
-#define MON_DATA_GIFT_RIBBON_5     76
-#define MON_DATA_GIFT_RIBBON_6     77
-#define MON_DATA_GIFT_RIBBON_7     78
-#define MON_DATA_FATEFUL_ENCOUNTER 79
-#define MON_DATA_OBEDIENCE         80
+#define MON_DATA_MARINE_RIBBON     72
+#define MON_DATA_LAND_RIBBON       73
+#define MON_DATA_SKY_RIBBON        74
+#define MON_DATA_COUNTRY_RIBBON    75
+#define MON_DATA_NATIONAL_RIBBON   76
+#define MON_DATA_EARTH_RIBBON      77
+#define MON_DATA_WORLD_RIBBON      78
+#define MON_DATA_FILLER            79
+#define MON_DATA_EVENT_LEGAL       80
 #define MON_DATA_KNOWN_MOVES       81
 #define MON_DATA_RIBBON_COUNT      82
 #define MON_DATA_RIBBONS           83
@@ -198,19 +198,30 @@
 #define MON_FEMALE     0xFE
 #define MON_GENDERLESS 0xFF
 
-#define FRIENDSHIP_EVENT_GROW_LEVEL           0x0
-#define FRIENDSHIP_EVENT_VITAMIN              0x1
-#define FRIENDSHIP_EVENT_BATTLE_ITEM          0x2
-#define FRIENDSHIP_EVENT_LEAGUE_BATTLE        0x3
-#define FRIENDSHIP_EVENT_LEARN_TMHM           0x4
-#define FRIENDSHIP_EVENT_WALKING              0x5
-#define FRIENDSHIP_EVENT_FAINT_SMALL          0x6
-#define FRIENDSHIP_EVENT_FAINT_OUTSIDE_BATTLE 0x7
-#define FRIENDSHIP_EVENT_FAINT_LARGE          0x8
+#define FRIENDSHIP_EVENT_GROW_LEVEL           0
+#define FRIENDSHIP_EVENT_VITAMIN              1
+#define FRIENDSHIP_EVENT_BATTLE_ITEM          2
+#define FRIENDSHIP_EVENT_LEAGUE_BATTLE        3
+#define FRIENDSHIP_EVENT_LEARN_TMHM           4
+#define FRIENDSHIP_EVENT_WALKING              5
+#define FRIENDSHIP_EVENT_MASSAGE              6
+#define FRIENDSHIP_EVENT_FAINT_SMALL          7
+#define FRIENDSHIP_EVENT_FAINT_OUTSIDE_BATTLE 8
+#define FRIENDSHIP_EVENT_FAINT_LARGE          9
 
 #define PARTY_SIZE 6
 #define MAX_TOTAL_EVS 510
 #define UNOWN_FORM_COUNT 28
 #define BOX_NAME_LENGTH 8
+
+#define EVO_MODE_NORMAL     0
+#define EVO_MODE_TRADE      1
+#define EVO_MODE_ITEM_USE   2
+#define EVO_MODE_ITEM_CHECK 3 // If an Everstone is being held, still want to show that the stone *could* be used on that Pokémon to evolve
+
+// used by ShouldIgnoreDeoxysForm
+#define DEOXYS_CHECK_BATTLE_SPRITE      1
+#define DEOXYS_CHECK_TRADE_MAIN         3
+#define DEOXYS_CHECK_BATTLE_ANIM        5
 
 #endif // GUARD_CONSTANTS_POKEMON_H

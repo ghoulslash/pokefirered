@@ -528,7 +528,7 @@ bool8 PSA_UseTM_RunZoomOutAnim(void)
         if (scene->field_0004 > 0)
         {
             scene->field_0004 = 0;
-            PlaySE(SE_W025);
+            PlaySE(SE_M_MEGA_KICK);
             BeginNormalPaletteFade(0x00000001, 2, 0, 12, RGB(8, 13, 31));
             PSAScene_SeedRandomInTask(scene);
             scene->state++;
@@ -560,7 +560,7 @@ bool8 PSA_UseTM_RunZoomOutAnim(void)
         }
         break;
     case 8:
-        PlaySE(SE_EXPMAX);
+        PlaySE(SE_EXP_MAX);
         DestroySprite(scene->itemIconSprite);
         scene->state++;
         break;
@@ -584,7 +584,7 @@ bool8 PSA_UseTM_RunMachineSetWobble(void)
     {
     case 0:
         MachineSetWobbleInit();
-        PlaySE(SE_MU_PACHI);
+        PlaySE(SE_SWITCH);
         scene->state++;
         break;
     case 1:
@@ -730,7 +730,7 @@ static void Task_ZoomAnim(u8 taskId)
     case 1:
         if (!IsZoomSpriteCBActive(sprite))
         {
-            PlaySE(SE_TB_KARA);
+            PlaySE(SE_BALL_TRAY_EXIT);
             MonSpriteZoom_UpdateYPos(sprite, tCurrCloseness);
             if (tHasItemSprite)
                 ItemSpriteZoom_UpdateYPos((void *)GetWordTaskArg(taskId, tOff_ItemSprite), tCurrCloseness);
@@ -933,7 +933,7 @@ static void Task_ItemUseOnMonAnim(u8 taskId)
         if (tTimer > 20)
         {
             tTimer = 0;
-            PlaySE(SE_W207B);
+            PlaySE(SE_M_SWAGGER2);
             sprite->invisible = FALSE;
             if (!tSuppressDots)
                 LoadOutwardSpiralDotsGfx();
@@ -949,7 +949,7 @@ static void Task_ItemUseOnMonAnim(u8 taskId)
             StartSpriteAffineAnim(sprite, tCloseness);
             BeginNormalPaletteFade(0x10000 << IndexOfSpritePaletteTag(1), -2, 0, 12, tBlendColor);
             tState = 2;
-            PlaySE(SE_W208);
+            PlaySE(SE_M_MILK_DRINK);
         }
         break;
     case 2:
@@ -968,7 +968,7 @@ static void Task_ItemUseOnMonAnim(u8 taskId)
             if (!tSuppressDots)
                 CreateSprites_UseItem_OutwardSpiralDots(taskId, data, sprite);
             if (tData7 == 0)
-                PlaySE(SE_W179);
+                PlaySE(SE_M_REVERSAL);
             tData7++;
             if (tData7 > 2)
                 tState = 4;
@@ -1038,10 +1038,8 @@ void PSA_UseItem_CleanUpForCancel(void)
 
 static void InitItemIconSpriteState(struct PokemonSpecialAnimScene * scene, struct Sprite * sprite, u8 closeness)
 {
-    u16 species;
+    u16 species, x, y;
     u32 personality;
-    register int x asm("r4"); // FIXME
-    u8 y;
     if (closeness == 3)
     {
         sprite->pos1.x = 120;
@@ -1056,22 +1054,33 @@ static void InitItemIconSpriteState(struct PokemonSpecialAnimScene * scene, stru
     sprite->pos1.y += 4;
     species = PSA_GetMonSpecies();
     personality = PSA_GetMonPersonality();
-    if (PSA_GetAnimType() == 4)
+    switch (PSA_GetAnimType())
     {
-        x = Menu2_GetMonSpriteAnchorCoord(species, personality, 0);
-        y = Menu2_GetMonSpriteAnchorCoord(species, personality, 1);
+        case 4:
+        {
+            x = Menu2_GetMonSpriteAnchorCoord(species, personality, 0);
+            y = Menu2_GetMonSpriteAnchorCoord(species, personality, 1);
+            if (x == 0xFF)
+                x = 0;
+            if (y == 0xFF)
+                y = 0;
+            sprite->data[6] = x;
+            sprite->data[7] = y;
+            break;
+        }
+        default:
+        {
+            x = Menu2_GetMonSpriteAnchorCoord(species, personality, 3);
+            y = Menu2_GetMonSpriteAnchorCoord(species, personality, 4);
+            if (x == 0xFF)
+                x = 0;
+            if (y == 0xFF)
+                y = 0;
+            sprite->data[6] = x;
+            sprite->data[7] = y;
+            break;
+        }
     }
-    else
-    {
-        x = Menu2_GetMonSpriteAnchorCoord(species, personality, 3);
-        y = Menu2_GetMonSpriteAnchorCoord(species, personality, 4);
-    }
-    if (x == 0xFF)
-        x = 0;
-    if (y == 0xFF)
-        y = 0;
-    sprite->data[6] = x;
-    sprite->data[7] = y;
     ItemSpriteZoom_UpdateYPos(sprite, closeness);
 }
 
@@ -1250,19 +1259,14 @@ static void StopMakingOutwardSpiralDots(void)
 static void Task_UseItem_OutwardSpiralDots(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
-    struct Sprite * sprite;
-    int x;
-    register int y asm("r10"); // FIXME
-    int x2;
-    int y2;
-    int ampl;
-    u8 spriteId;
+
     switch (tState)
     {
     case 0:
         if (tTimer == 0)
         {
-            sprite = PSA_GetSceneWork()->itemIconSprite;
+            u32 spriteId, x, y, x2, y2, ampl;
+            struct Sprite * sprite = PSA_GetSceneWork()->itemIconSprite;
             x = sprite->pos1.x + sprite->pos2.x;
             y = sprite->pos1.y + sprite->pos2.y;
             ampl = (PSAScene_RandomFromTask(taskId) % 21) + 70;

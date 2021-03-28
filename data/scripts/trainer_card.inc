@@ -1,3 +1,5 @@
+.set LOCALID_STICKER_MAN, 1
+
 CeladonCity_GameCorner_EventScript_PhotoPrinter:: @ 81B2867
 	lockall
 	showmoneybox 0, 0, 0
@@ -44,7 +46,7 @@ CeladonCity_GameCorner_EventScript_PrintTypeSepia:: @ 81B28FC
 CeladonCity_GameCorner_EventScript_PrintPhoto:: @ 81B2907
 	message CeladonCity_GameCorner_Text_BigSmileForPhoto
 	waitmessage
-	playse MUS_ME_PHOTO
+	playse MUS_PHOTO
 	dofieldeffect FLDEFF_UNK_45
 	delay 60
 	special UpdateTrainerCardPhotoIcons
@@ -74,12 +76,12 @@ FourIsland_House2_EventScript_StickerMan:: @ 81B2938
 FourIsland_House2_EventScript_MeetStickerMan:: @ 81B2951
 	setflag FLAG_MET_STICKER_MAN
 	msgbox FourIsland_House2_Text_WishICouldShowOffStickers
-	applymovement 1, Movement_FacePlayer
+	applymovement LOCALID_STICKER_MAN, Movement_FacePlayer
 	waitmovement 0
 	playse SE_PIN
-	applymovement 1, Movement_ExclamationMark
+	applymovement LOCALID_STICKER_MAN, Movement_ExclamationMark
 	waitmovement 0
-	applymovement 1, Movement_Delay48
+	applymovement LOCALID_STICKER_MAN, Movement_Delay48
 	waitmovement 0
 	compare VAR_0x8008, 0
 	goto_if_eq FourIsland_House2_EventScript_StickerManNothingToBrag
@@ -89,7 +91,7 @@ FourIsland_House2_EventScript_MeetStickerMan:: @ 81B2951
 	end
 
 FourIsland_House2_EventScript_StickerManAskForBrag:: @ 81B2994
-	applymovement 1, Movement_FacePlayer
+	applymovement LOCALID_STICKER_MAN, Movement_FacePlayer
 	waitmovement 0
 	goto_if_questlog EventScript_ReleaseEnd
 	special QuestLog_CutRecording
@@ -237,7 +239,7 @@ FourIsland_House2_EventScript_AlreadyBraggedHoFMax:: @ 81B2C47
 
 FourIsland_House2_EventScript_BraggedHoF:: @ 81B2C51
 	textcolor 3
-	playfanfare MUS_FANFA1
+	playfanfare MUS_LEVEL_UP
 	message FourIsland_House2_Text_HoFStickerApplied
 	waitmessage
 	waitfanfare
@@ -300,7 +302,7 @@ FourIsland_House2_EventScript_AlreadyBraggedEggsMax:: @ 81B2D11
 
 FourIsland_House2_EventScript_BraggedEggs:: @ 81B2D1B
 	textcolor 3
-	playfanfare MUS_FANFA1
+	playfanfare MUS_LEVEL_UP
 	message FourIsland_House2_Text_EggStickerApplied
 	waitmessage
 	waitfanfare
@@ -363,7 +365,7 @@ FourIsland_House2_EventScript_AlreadyBraggedLinkWinsMax:: @ 81B2DDB
 
 FourIsland_House2_EventScript_BraggedLinkWins:: @ 81B2DE5
 	textcolor 3
-	playfanfare MUS_FANFA1
+	playfanfare MUS_LEVEL_UP
 	message FourIsland_House2_Text_VictoryStickerApplied
 	waitmessage
 	waitfanfare

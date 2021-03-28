@@ -1,3 +1,5 @@
+.set LOCALID_RIVAL, 1
+
 PokemonTower_2F_MapScripts:: @ 8163285
 	.byte 0
 
@@ -19,17 +21,17 @@ PokemonTower_2F_EventScript_RivalTriggerDown:: @ 816329B
 
 PokemonTower_2F_EventScript_Rival:: @ 81632A7
 	textcolor 0
-	playbgm MUS_RIVAL1, 0
+	playbgm MUS_ENCOUNTER_RIVAL, 0
 	compare VAR_TEMP_1, 0
 	call_if_eq PokemonTower_2F_EventScript_RivalFacePlayerRight
 	compare VAR_TEMP_1, 1
 	call_if_eq PokemonTower_2F_EventScript_RivalFacePlayerDown
-	applymovement 1, Movement_ExclamationMark
+	applymovement LOCALID_RIVAL, Movement_ExclamationMark
 	waitmovement 0
-	applymovement 1, Movement_Delay48
+	applymovement LOCALID_RIVAL, Movement_Delay48
 	waitmovement 0
 	msgbox PokemonTower_2F_Text_RivalIntro
-	setvar VAR_LAST_TALKED, 1
+	setvar VAR_LAST_TALKED, LOCALID_RIVAL
 	compare VAR_STARTER_MON, 2
 	call_if_eq PokemonTower_2F_EventScript_RivalSquirtle
 	compare VAR_STARTER_MON, 1
@@ -38,27 +40,27 @@ PokemonTower_2F_EventScript_Rival:: @ 81632A7
 	call_if_eq PokemonTower_2F_EventScript_RivalCharmander
 	msgbox PokemonTower_2F_Text_RivalPostBattle
 	closemessage
-	playbgm MUS_RIVAL2, 0
+	playbgm MUS_RIVAL_EXIT, 0
 	compare VAR_TEMP_1, 0
 	call_if_eq PokemonTower_2F_EventScript_RivalExitRight
 	compare VAR_TEMP_1, 1
 	call_if_eq PokemonTower_2F_EventScript_RivalExitDown
-	playse SE_KAIDAN
+	playse SE_EXIT
 	delay 25
 	fadedefaultbgm
-	removeobject 1
+	removeobject LOCALID_RIVAL
 	setvar VAR_MAP_SCENE_POKEMON_TOWER_2F, 1
 	releaseall
 	end
 
 PokemonTower_2F_EventScript_RivalFacePlayerRight:: @ 8163339
-	applymovement 1, Movement_WalkInPlaceFastestRight
+	applymovement LOCALID_RIVAL, Movement_WalkInPlaceFastestRight
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkInPlaceFastestLeft
 	waitmovement 0
 	return
 
 PokemonTower_2F_EventScript_RivalFacePlayerDown:: @ 816334B
-	applymovement 1, Movement_WalkInPlaceFastestDown
+	applymovement LOCALID_RIVAL, Movement_WalkInPlaceFastestDown
 	applymovement OBJ_EVENT_ID_PLAYER, Movement_WalkInPlaceFastestUp
 	waitmovement 0
 	return
@@ -76,12 +78,12 @@ PokemonTower_2F_EventScript_RivalCharmander:: @ 8163373
 	return
 
 PokemonTower_2F_EventScript_RivalExitRight:: @ 816337E
-	applymovement 1, PokemonTower_2F_Movement_RivalExitRight
+	applymovement LOCALID_RIVAL, PokemonTower_2F_Movement_RivalExitRight
 	waitmovement 0
 	return
 
 PokemonTower_2F_EventScript_RivalExitDown:: @ 8163389
-	applymovement 1, PokemonTower_2F_Movement_RivalExitDown
+	applymovement LOCALID_RIVAL, PokemonTower_2F_Movement_RivalExitDown
 	waitmovement 0
 	return
 

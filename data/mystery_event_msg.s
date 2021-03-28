@@ -52,7 +52,7 @@ SurfPichu_GiveIfPossible: @ 8488EC4
 	vmessage sText_MysteryGiftEgg
 	waitmessage
 	waitbuttonpress
-	playfanfare MUS_FANFA4
+	playfanfare MUS_OBTAIN_ITEM
 	waitfanfare
 	release
 	end
@@ -68,7 +68,7 @@ SurfPichu_FullParty: @ 8488EEB
 
 SurfPichu_GiveEgg: @ 8488EF6
 	giveegg SPECIES_PICHU
-	setmonobedient VAR_EVENT_PICHU_SLOT
+	setmoneventlegal VAR_EVENT_PICHU_SLOT
 	setmonmetlocation VAR_EVENT_PICHU_SLOT, 0xff
 	compare VAR_EVENT_PICHU_SLOT, 1
 	vgoto_if_eq SurfPichu_Slot1

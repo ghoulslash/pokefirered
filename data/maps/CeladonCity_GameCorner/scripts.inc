@@ -1,3 +1,5 @@
+.set LOCALID_GRUNT, 11
+
 CeladonCity_GameCorner_MapScripts:: @ 816C646
 	map_script MAP_SCRIPT_ON_LOAD, CeladonCity_GameCorner_OnLoad
 	.byte 0
@@ -403,7 +405,7 @@ CeladonCity_GameCorner_EventScript_Poster:: @ 816CAAA
 	end
 
 CeladonCity_GameCorner_EventScript_OpenRocketHideout:: @ 816CABE
-	playse SE_KI_GASYAN
+	playse SE_UNLOCK
 	setmetatile 15, 2, METATILE_GameCorner_Floor_StairsTop, 0
 	setmetatile 16, 2, METATILE_GameCorner_StairsTop, 1
 	setmetatile 17, 2, METATILE_GameCorner_StairsBottom, 1
@@ -425,17 +427,17 @@ CeladonCity_GameCorner_Text_DefeatedGrunt:: @ 816CB10
 	call_if_eq CeladonCity_GameCorner_Text_GruntExitWest
 	compare VAR_FACING, DIR_WEST
 	call_if_ne CeladonCity_GameCorner_Text_GruntExit
-	removeobject 11
+	removeobject LOCALID_GRUNT
 	release
 	end
 
 CeladonCity_GameCorner_Text_GruntExitWest:: @ 816CB34
-	applymovement 11, CeladonCity_GameCorner_Movement_GruntExitWest
+	applymovement LOCALID_GRUNT, CeladonCity_GameCorner_Movement_GruntExitWest
 	waitmovement 0
 	return
 
 CeladonCity_GameCorner_Text_GruntExit:: @ 816CB3F
-	applymovement 11, CeladonCity_GameCorner_Movement_GruntExit
+	applymovement LOCALID_GRUNT, CeladonCity_GameCorner_Movement_GruntExit
 	waitmovement 0
 	return
 

@@ -14,7 +14,6 @@
 #include "util.h"
 #include "trig.h"
 #include "constants/songs.h"
-#include "constants/species.h"
 
 struct IntroSequenceData;
 
@@ -1036,7 +1035,7 @@ static void IntroCB_GameFreakStar(struct IntroSequenceData * this)
     switch (this->state)
     {
     case 0:
-        PlaySE(MUS_TITLEROG);
+        PlaySE(MUS_GAME_FREAK);
         GameFreakScene_LoadGfxCreateStar();
         this->data[5] = 0;
         this->state++;
@@ -1206,7 +1205,7 @@ static void IntroCB_FightScene(struct IntroSequenceData * this)
     case 3:
         if (!gPaletteFade.active)
         {
-            m4aSongNumStart(MUS_DEMO);
+            m4aSongNumStart(MUS_INTRO_FIGHT);
             this->data[5] = 0;
             this->state++;
         }

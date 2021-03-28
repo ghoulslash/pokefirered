@@ -1,3 +1,5 @@
+.set LOCALID_SS_ANNE, 1
+
 SSAnne_Exterior_MapScripts:: @ 8160840
 	map_script MAP_SCRIPT_ON_TRANSITION, SSAnne_Exterior_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, SSAnne_Exterior_OnFrame
@@ -18,11 +20,11 @@ SSAnne_Exterior_ExitSSAnne:: @ 8160859
 	call_if_le SSAnne_Exterior_WalkDown
 	compare VAR_0x8005, 7
 	call_if_ge SSAnne_Exterior_WalkInPlaceDown
-	fadenewbgm MUS_NAMINORI
+	fadenewbgm MUS_SURF
 	delay 50
 	special DoSSAnneDepartureCutscene
 	waitstate
-	removeobject 1
+	removeobject LOCALID_SS_ANNE
 	applymovement OBJ_EVENT_ID_PLAYER, SSAnne_Exterior_Movement_Exit
 	waitmovement 0
 	setvar VAR_MAP_SCENE_VERMILION_CITY, 2

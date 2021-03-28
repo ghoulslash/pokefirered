@@ -5,6 +5,9 @@
 #include "gba/gba.h"
 #include <string.h>
 #include "constants/global.h"
+#include "constants/flags.h"
+#include "constants/vars.h"
+#include "constants/species.h"
 
 // Prevent cross-jump optimization.
 #define BLOCK_CROSS_JUMP asm("");
@@ -13,7 +16,7 @@
 #define asm_comment(x) asm volatile("@ -- " x " -- ")
 #define asm_unified(x) asm(".syntax unified\n" x "\n.syntax divided")
 
-#if defined (__APPLE__) || defined (__CYGWIN__)
+#if defined (__APPLE__) || defined (__CYGWIN__) || defined(__CLION_IDE__)
 // Get the IDE to stfu
 
 // We define it this way to fool preproc.
@@ -28,9 +31,7 @@
 #define __(x) (x)
 #endif // __APPLE__
 
-#define ARRAY_COUNT(array) (sizeof(array) / sizeof((array)[0]))
-// GF's lingo
-#define NELEMS ARRAY_COUNT
+#define NELEMS(array) (sizeof(array) / sizeof((array)[0]))
 
 #define SWAP(a, b, temp)    \
 {                           \
@@ -87,6 +88,11 @@ extern u8 gStringVar2[];
 extern u8 gStringVar3[];
 extern u8 gStringVar4[];
 
+#define ROUND_BITS_TO_BYTES(numBits)(((numBits) / 8) + (((numBits) % 8) ? 1 : 0))
+
+#define DEX_FLAGS_NO (ROUND_BITS_TO_BYTES(NUM_SPECIES))
+#define NUM_FLAG_BYTES (ROUND_BITS_TO_BYTES(FLAGS_COUNT))
+
 struct Coords8
 {
     s8 x;
@@ -130,8 +136,6 @@ struct Time
     /*0x03*/ s8 minutes;
     /*0x04*/ s8 seconds;
 };
-
-#define DEX_FLAGS_NO ((POKEMON_SLOTS_NUMBER / 8) + ((POKEMON_SLOTS_NUMBER % 8) ? 1 : 0))
 
 struct Pokedex
 {
@@ -287,7 +291,7 @@ struct SaveBlock2
     /*0xB10*/ struct BerryPickingResults berryPick;
     /*0xB20*/ u8 filler_B20[0x400];
     /*0xF20*/ u32 encryptionKey;
-};
+}; // size: 0xF24
 
 extern struct SaveBlock2 *gSaveBlock2Ptr;
 
@@ -549,8 +553,6 @@ struct QuestLogNPCData
 };
 
 #define BERRY_TREES_COUNT  128
-#define FLAGS_COUNT        288 // 300
-#define VARS_COUNT         256
 #define MAIL_COUNT         (PARTY_SIZE + 10)
 #define PC_MAIL_NUM(i)     (PARTY_SIZE + (i))
 
@@ -603,7 +605,7 @@ struct QuestLog
 
     // These arrays hold the game state for
     // playing back the quest log
-    /*0x0148*/ u8 flags[FLAGS_COUNT];
+    /*0x0148*/ u8 flags[NUM_FLAG_BYTES];
     /*0x02c8*/ u16 vars[VARS_COUNT];
     /*0x0468*/ struct QuestLogNPCData npcData[64];
     /*0x0568*/ u16 script[128];
@@ -711,6 +713,52 @@ struct TrainerNameRecord
     u8 trainerName[PLAYER_NAME_LENGTH + 1];
 };
 
+// For external event data storage. The majority of these may have never been used.
+// In FRLG, the only known used fields are the PokeCoupon and BoxRS ones, but hacking the distribution discs allows FRLG to receive events and set the others
+struct ExternalEventData
+{
+    u8 unknownExternalDataFields1[7]; // if actually used, may be broken up into different fields.
+    u32 unknownExternalDataFields2:8;
+    u32 currentPokeCoupons:24; // PokéCoupons stored by Pokémon Colosseum and XD from Mt. Battle runs. Earned PokéCoupons are also added to totalEarnedPokeCoupons. Colosseum/XD caps this at 9,999,999, but will read up to 16,777,215.
+    u32 gotGoldPokeCouponTitleReward:1; // Master Ball from Jp Colosseum Bonus Disc; for reaching 30,000 totalEarnedPokeCoupons
+    u32 gotSilverPokeCouponTitleReward:1; // Light Ball Pikachu from JP Colosseum Bonus Disc; for reaching 5000 totalEarnedPokeCoupons
+    u32 gotBronzePokeCouponTitleReward:1; // PP Max from JP Colosseum Bonus Disc; for reaching 2500 totalEarnedPokeCoupons
+    u32 receivedAgetoCelebi:1; // from JP Colosseum Bonus Disc
+    u32 unknownExternalDataFields3:4;
+    u32 totalEarnedPokeCoupons:24; // Used by the JP Colosseum bonus disc. Determines PokéCoupon rank to distribute rewards. Unread in International games. Colosseum/XD caps this at 9,999,999.
+    u8 unknownExternalDataFields4[5]; // if actually used, may be broken up into different fields.
+} __attribute__((packed)); /*size = 0x14*/
+
+// For external event flags. The majority of these may have never been used.
+// In FRLG, Jirachi cannot normally be received, but hacking the distribution discs allows FRLG to receive Jirachi and set the flag
+struct ExternalEventFlags
+{
+    u8 usedBoxRS:1; // Set by Pokémon Box: Ruby & Sapphire; denotes whether this save has connected to it and triggered the free False Swipe Swablu Egg giveaway.
+    u8 boxRSEggsUnlocked:2; // Set by Pokémon Box: Ruby & Sapphire; denotes the number of Eggs unlocked from deposits; 1 for ExtremeSpeed Zigzagoon (at 100 deposited), 2 for Pay Day Skitty (at 500 deposited), 3 for Surf Pichu (at 1499 deposited)
+    u8 padding:5;
+    u8 unknownFlag1;
+    u8 receivedGCNJirachi; // Both the US Colosseum Bonus Disc and PAL/AUS Pokémon Channel use this field. One cannot receive a WISHMKR Jirachi and CHANNEL Jirachi with the same savefile.
+    u8 unknownFlag3;
+    u8 unknownFlag4;
+    u8 unknownFlag5;
+    u8 unknownFlag6;
+    u8 unknownFlag7;
+    u8 unknownFlag8;
+    u8 unknownFlag9;
+    u8 unknownFlag10;
+    u8 unknownFlag11;
+    u8 unknownFlag12;
+    u8 unknownFlag13;
+    u8 unknownFlag14;
+    u8 unknownFlag15;
+    u8 unknownFlag16;
+    u8 unknownFlag17;
+    u8 unknownFlag18;
+    u8 unknownFlag19;
+    u8 unknownFlag20;
+
+} __attribute__((packed));/*size = 0x15*/
+
 #define UNION_ROOM_KB_ROW_COUNT 10
 
 // quest menu
@@ -748,7 +796,7 @@ struct SaveBlock1
     /*0x063A*/ u8 ALIGNED(2) trainerRematches[100];
     /*0x06A0*/ struct ObjectEvent objectEvents[OBJECT_EVENTS_COUNT];
     /*0x08E0*/ struct ObjectEventTemplate objectEventTemplates[64];
-    /*0x0EE0*/ u8 flags[FLAGS_COUNT];
+    /*0x0EE0*/ u8 flags[NUM_FLAG_BYTES];
     /*0x1000*/ u16 vars[VARS_COUNT];
     /*0x1200*/ u32 gameStats[NUM_GAME_STATS];
     /*0x1300*/ struct QuestLog questLog[QUEST_LOG_SCENE_COUNT];
@@ -761,7 +809,9 @@ struct SaveBlock1
     /*0x2F18*/ OldMan oldMan; // unused
     /*0x2F54*/ struct EasyChatPair easyChatPairs[5]; // unused
     /*0x2F80*/ struct DayCare daycare;
-    /*0x309C*/ u8 giftRibbons[52];
+    /*0x309C*/ u8 giftRibbons[11];
+    /*0x30A7*/ struct ExternalEventData externalEventData;
+    /*0x30BB*/ struct ExternalEventFlags externalEventFlags;
     /*0x30D0*/ struct Roamer roamer;
     /*0x30EC*/ struct EnigmaBerry enigmaBerry;
     /*0x3120*/ struct MEventBuffers mysteryEventBuffers;
@@ -781,7 +831,7 @@ struct SaveBlock1
     /*0x3C44*/ u8 unlockedQuests[SIDE_QUEST_FLAGS_COUNT];
     /*0x????*/ u8 completedQuests[SIDE_QUEST_FLAGS_COUNT];
     /*0x????*/ u8 activeQuest;
-};
+}; // size: 0x3D68
 
 struct MapPosition
 {

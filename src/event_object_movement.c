@@ -89,7 +89,7 @@ static bool8 sub_805E27C(struct ObjectEventTemplate *, s16, s16);
 static bool8 sub_805E2E8(struct ObjectEventTemplate *, s16, s16);
 static void sub_805E384(struct ObjectEventTemplate *);
 static bool8 MovementType_Disguise_Callback(struct ObjectEvent *, struct Sprite *);
-static bool8 MovementType_Hidden_Callback(struct ObjectEvent *, struct Sprite *);
+static bool8 MovementType_Buried_Callback(struct ObjectEvent *, struct Sprite *);
 static u8 sub_8063304(struct ObjectEvent *, struct Sprite *);
 static u8 sub_8063324(struct ObjectEvent *, struct Sprite *);
 static u8 sub_8063344(struct ObjectEvent *, struct Sprite *);
@@ -142,7 +142,7 @@ static void MovementType_CopyPlayer(struct Sprite *);
 static void MovementType_TreeDisguise(struct Sprite *);
 static void MovementType_MountainDisguise(struct Sprite *);
 static void MovementType_CopyPlayerInGrass(struct Sprite *);
-static void MovementType_Hidden(struct Sprite *);
+static void MovementType_Buried(struct Sprite *);
 static void MovementType_WalkInPlace(struct Sprite *);
 static void MovementType_WalkSlowlyInPlace(struct Sprite *);
 static void MovementType_JogInPlace(struct Sprite *);
@@ -261,7 +261,7 @@ static void (*const sMovementTypeCallbacks[])(struct Sprite *) = {
     MovementType_CopyPlayerInGrass,
     MovementType_CopyPlayerInGrass,
     MovementType_CopyPlayerInGrass,
-    MovementType_Hidden,
+    MovementType_Buried,
     MovementType_WalkInPlace,
     MovementType_WalkInPlace,
     MovementType_WalkInPlace,
@@ -345,7 +345,7 @@ const bool8 gRangedMovementTypes[NUM_FIELD_MAP_OBJECT_TEMPLATES] = {
     [MOVEMENT_TYPE_COPY_PLAYER_OPPOSITE_IN_GRASS] = TRUE,
     [MOVEMENT_TYPE_COPY_PLAYER_COUNTERCLOCKWISE_IN_GRASS] = TRUE,
     [MOVEMENT_TYPE_COPY_PLAYER_CLOCKWISE_IN_GRASS] = TRUE,
-    [MOVEMENT_TYPE_HIDDEN] = FALSE,
+    [MOVEMENT_TYPE_BURIED] = FALSE,
     [MOVEMENT_TYPE_WALK_IN_PLACE_DOWN] = FALSE,
     [MOVEMENT_TYPE_WALK_IN_PLACE_UP] = FALSE,
     [MOVEMENT_TYPE_WALK_IN_PLACE_LEFT] = FALSE,
@@ -429,7 +429,7 @@ const u8 gInitialMovementTypeFacingDirections[NUM_FIELD_MAP_OBJECT_TEMPLATES] = 
     [MOVEMENT_TYPE_COPY_PLAYER_OPPOSITE_IN_GRASS] = DIR_SOUTH,
     [MOVEMENT_TYPE_COPY_PLAYER_COUNTERCLOCKWISE_IN_GRASS] = DIR_WEST,
     [MOVEMENT_TYPE_COPY_PLAYER_CLOCKWISE_IN_GRASS] = DIR_EAST,
-    [MOVEMENT_TYPE_HIDDEN] = DIR_SOUTH,
+    [MOVEMENT_TYPE_BURIED] = DIR_SOUTH,
     [MOVEMENT_TYPE_WALK_IN_PLACE_DOWN] = DIR_SOUTH,
     [MOVEMENT_TYPE_WALK_IN_PLACE_UP] = DIR_NORTH,
     [MOVEMENT_TYPE_WALK_IN_PLACE_LEFT] = DIR_WEST,
@@ -1322,45 +1322,54 @@ static u8 GetObjectEventIdByLocalId(u8 localId)
     return OBJECT_EVENTS_COUNT;
 }
 
-#ifdef NONMATCHING
 static u8 InitObjectEventStateFromTemplate(struct ObjectEventTemplate *template, u8 mapNum, u8 mapGroup)
 {
     struct ObjectEvent *objectEvent;
-    struct ObjectEventTemplate *template2 = template;
+    const struct MapHeader *mapHeader;
     u8 objectEventId;
+    u8 var0;
+    u8 elevation;
     s16 x;
     s16 y;
-    s16 var;
     s16 x2;
     s16 y2;
-    s16 elevation2;
+    s16 x3;
+    s16 y3;
     
-    if(template->unk2 == 0xFF)
+    var0 = 0;
+    elevation = 0;
+    x2 = 0;
+    y2 = 0;
+    x3 = 0;
+    y3 = 0;
+    
+    if (template->inConnection == 0xFF)
     {
-        var = 1;
-        mapNum = template2->trainerType;
-        mapGroup = template2->trainerRange_berryTreeId & 0xFF;
-        elevation2 = template2->elevation;
-        x = template2->x;
-        y = template2->y;
-        x2 = template2->x;
-        y2 = template2->y;
-        template = &Overworld_GetMapHeaderByGroupAndId(mapGroup, mapNum)->events->objectEvents[elevation2 - 1];
+        var0 = 1;
+        elevation = template->elevation;
+        mapNum = template->trainerType;
+        mapGroup = template->trainerRange_berryTreeId & 0xFF;
+        x2 = template->x;
+        y2 = template->y;
+        x3 = template->x;
+        y3 = template->y;
+        mapHeader = Overworld_GetMapHeaderByGroupAndId(mapGroup, mapNum);
+        template = &(mapHeader->events->objectEvents[elevation - 1]);
     }
     if (GetAvailableObjectEventId(template->localId, mapNum, mapGroup, &objectEventId)
-        && !sub_805E238(template, var, x2, y2))
+        || !sub_805E238(template, var0, x3, y3))
         return OBJECT_EVENTS_COUNT;
     objectEvent = &gObjectEvents[objectEventId];
     ClearObjectEvent(objectEvent);
-    if (var)
-    {
-        x = x2 * 0x10000 + 0x7000;
-        y = y2 * 0x10000 + 0x7000;
-    }
-    else
+    if (var0)
     {
         x = x2 + 7;
         y = y2 + 7;
+    }
+    else
+    {
+        x = template->x + 7;
+        y = template->y + 7;
     }
     objectEvent->active = TRUE;
     objectEvent->triggerGroundEffectsOnMove = TRUE;
@@ -1368,7 +1377,6 @@ static u8 InitObjectEventStateFromTemplate(struct ObjectEventTemplate *template,
     objectEvent->movementType = template->movementType;
     objectEvent->localId = template->localId;
     objectEvent->mapNum = mapNum;
-    // objectEvent++; objectEvent--; is a trick used in pokeruby and pokeemerald here
     objectEvent->mapGroup = mapGroup;
     objectEvent->initialCoords.x = x;
     objectEvent->initialCoords.y = y;
@@ -1378,258 +1386,27 @@ static u8 InitObjectEventStateFromTemplate(struct ObjectEventTemplate *template,
     objectEvent->previousCoords.y = y;
     objectEvent->currentElevation = template->elevation;
     objectEvent->previousElevation = template->elevation;
-    objectEvent->range.as_nybbles.x = template->movementRangeX;
-    objectEvent->range.as_nybbles.y = template->movementRangeY;
+    objectEvent->rangeX = template->movementRangeX;
+    objectEvent->rangeY = template->movementRangeY;
     objectEvent->trainerType = template->trainerType;
     objectEvent->trainerRange_berryTreeId = template->trainerRange_berryTreeId;
+    objectEvent->mapNum = mapNum; // oops (yes this is required for matching)
     objectEvent->previousMovementDirection = gInitialMovementTypeFacingDirections[template->movementType];
     SetObjectEventDirection(objectEvent, objectEvent->previousMovementDirection);
     SetObjectEventDynamicGraphicsId(objectEvent);
-/*#ifndef NONMATCHING
-    asm("":::"r5", "r6"); is a trick used in pokeruby and pokeemerald here
-#endif*/
     if (gRangedMovementTypes[objectEvent->movementType])
     {
-        if (objectEvent->range.as_nybbles.x == 0)
+        if (objectEvent->rangeX == 0)
         {
-            objectEvent->range.as_nybbles.x++;
+            objectEvent->rangeX++;
         }
-        if (objectEvent->range.as_nybbles.y == 0)
+        if (objectEvent->rangeY == 0)
         {
-            objectEvent->range.as_nybbles.y++;
+            objectEvent->rangeY++;
         }
     }
     return objectEventId;
 }
-#else
-NAKED
-static u8 InitObjectEventStateFromTemplate(struct ObjectEventTemplate *template, u8 mapNum, u8 mapGroup)
-{
-    asm_unified("\n\
-        push {r4-r7,lr}\n\
-        mov r7, r10\n\
-        mov r6, r9\n\
-        mov r5, r8\n\
-        push {r5-r7}\n\
-        sub sp, 0xC\n\
-        adds r5, r0, 0\n\
-        lsls r1, 24\n\
-        lsrs r7, r1, 24\n\
-        lsls r2, 24\n\
-        lsrs r6, r2, 24\n\
-        movs r0, 0\n\
-        mov r10, r0\n\
-        mov r8, r0\n\
-        mov r9, r0\n\
-        movs r1, 0\n\
-        str r1, [sp, 0x4]\n\
-        str r0, [sp, 0x8]\n\
-        ldrb r0, [r5, 0x2]\n\
-        cmp r0, 0xFF\n\
-        bne _0805E0DA\n\
-        movs r1, 0x1\n\
-        mov r10, r1\n\
-        ldrb r4, [r5, 0x8]\n\
-        ldrb r7, [r5, 0xC]\n\
-        ldrb r6, [r5, 0xE]\n\
-        ldrh r0, [r5, 0x4]\n\
-        mov r8, r0\n\
-        ldrh r5, [r5, 0x6]\n\
-        mov r9, r5\n\
-        mov r1, r8\n\
-        str r1, [sp, 0x4]\n\
-        mov r0, r9\n\
-        str r0, [sp, 0x8]\n\
-        adds r0, r6, 0\n\
-        adds r1, r7, 0\n\
-        bl Overworld_GetMapHeaderByGroupAndId\n\
-        ldr r1, [r0, 0x4]\n\
-        lsls r0, r4, 1\n\
-        adds r0, r4\n\
-        lsls r0, 3\n\
-        subs r0, 0x18\n\
-        ldr r1, [r1, 0x4]\n\
-        adds r5, r1, r0\n\
-    _0805E0DA:\n\
-        ldrb r0, [r5]\n\
-        adds r1, r7, 0\n\
-        adds r2, r6, 0\n\
-        mov r3, sp\n\
-        bl GetAvailableObjectEventId\n\
-        lsls r0, 24\n\
-        cmp r0, 0\n\
-        bne _0805E106\n\
-        ldr r1, [sp, 0x4]\n\
-        lsls r2, r1, 16\n\
-        asrs r2, 16\n\
-        ldr r0, [sp, 0x8]\n\
-        lsls r3, r0, 16\n\
-        asrs r3, 16\n\
-        adds r0, r5, 0\n\
-        mov r1, r10\n\
-        bl sub_805E238\n\
-        lsls r0, 24\n\
-        cmp r0, 0\n\
-        bne _0805E10A\n\
-    _0805E106:\n\
-        movs r0, 0x10\n\
-        b _0805E220\n\
-    _0805E10A:\n\
-        mov r0, sp\n\
-        ldrb r1, [r0]\n\
-        lsls r0, r1, 3\n\
-        adds r0, r1\n\
-        lsls r0, 2\n\
-        ldr r1, _0805E13C @ =gObjectEvents\n\
-        adds r4, r0, r1\n\
-        adds r0, r4, 0\n\
-        bl ClearObjectEvent\n\
-        mov r1, r10\n\
-        cmp r1, 0\n\
-        beq _0805E140\n\
-        mov r1, r8\n\
-        lsls r0, r1, 16\n\
-        movs r1, 0xE0\n\
-        lsls r1, 11\n\
-        adds r0, r1\n\
-        lsrs r3, r0, 16\n\
-        mov r1, r9\n\
-        lsls r0, r1, 16\n\
-        movs r1, 0xE0\n\
-        lsls r1, 11\n\
-        adds r0, r1\n\
-        b _0805E14E\n\
-        .align 2, 0\n\
-    _0805E13C: .4byte gObjectEvents\n\
-    _0805E140:\n\
-        ldrh r0, [r5, 0x4]\n\
-        adds r0, 0x7\n\
-        lsls r0, 16\n\
-        lsrs r3, r0, 16\n\
-        ldrh r0, [r5, 0x6]\n\
-        adds r0, 0x7\n\
-        lsls r0, 16\n\
-    _0805E14E:\n\
-        lsrs r2, r0, 16\n\
-        ldrb r0, [r4]\n\
-        movs r1, 0x1\n\
-        orrs r0, r1\n\
-        movs r1, 0x4\n\
-        orrs r0, r1\n\
-        strb r0, [r4]\n\
-        ldrb r0, [r5, 0x1]\n\
-        strb r0, [r4, 0x5]\n\
-        ldrb r0, [r5, 0x9]\n\
-        strb r0, [r4, 0x6]\n\
-        ldrb r0, [r5]\n\
-        strb r0, [r4, 0x8]\n\
-        strb r7, [r4, 0x9]\n\
-        strb r6, [r4, 0xA]\n\
-        strh r3, [r4, 0xC]\n\
-        strh r2, [r4, 0xE]\n\
-        strh r3, [r4, 0x10]\n\
-        strh r2, [r4, 0x12]\n\
-        strh r3, [r4, 0x14]\n\
-        strh r2, [r4, 0x16]\n\
-        ldrb r0, [r5, 0x8]\n\
-        movs r6, 0xF\n\
-        adds r1, r6, 0\n\
-        ands r1, r0\n\
-        ldrb r2, [r4, 0xB]\n\
-        movs r0, 0x10\n\
-        negs r0, r0\n\
-        mov r8, r0\n\
-        ands r0, r2\n\
-        orrs r0, r1\n\
-        strb r0, [r4, 0xB]\n\
-        ldrb r1, [r5, 0x8]\n\
-        lsls r1, 4\n\
-        ands r0, r6\n\
-        orrs r0, r1\n\
-        strb r0, [r4, 0xB]\n\
-        ldrb r1, [r5, 0xA]\n\
-        lsls r1, 28\n\
-        movs r0, 0xF\n\
-        mov r9, r0\n\
-        lsrs r1, 28\n\
-        ldrb r2, [r4, 0x19]\n\
-        mov r0, r8\n\
-        ands r0, r2\n\
-        orrs r0, r1\n\
-        strb r0, [r4, 0x19]\n\
-        ldrb r1, [r5, 0xA]\n\
-        lsrs r1, 4\n\
-        lsls r1, 4\n\
-        ands r0, r6\n\
-        orrs r0, r1\n\
-        strb r0, [r4, 0x19]\n\
-        ldrh r0, [r5, 0xC]\n\
-        strb r0, [r4, 0x7]\n\
-        ldrh r0, [r5, 0xE]\n\
-        strb r0, [r4, 0x1D]\n\
-        ldr r1, _0805E230 @ =gInitialMovementTypeFacingDirections\n\
-        ldrb r0, [r5, 0x9]\n\
-        adds r0, r1\n\
-        ldrb r1, [r0]\n\
-        adds r0, r4, 0\n\
-        adds r0, 0x20\n\
-        strb r1, [r0]\n\
-        ldrb r1, [r0]\n\
-        adds r0, r4, 0\n\
-        bl SetObjectEventDirection\n\
-        adds r0, r4, 0\n\
-        bl SetObjectEventDynamicGraphicsId\n\
-        ldr r1, _0805E234 @ =gRangedMovementTypes\n\
-        ldrb r0, [r4, 0x6]\n\
-        adds r0, r1\n\
-        ldrb r0, [r0]\n\
-        cmp r0, 0\n\
-        beq _0805E21C\n\
-        ldrb r2, [r4, 0x19]\n\
-        adds r0, r6, 0\n\
-        ands r0, r2\n\
-        cmp r0, 0\n\
-        bne _0805E204\n\
-        lsls r0, r2, 28\n\
-        lsrs r0, 28\n\
-        adds r0, 0x1\n\
-        mov r1, r9\n\
-        ands r0, r1\n\
-        mov r1, r8\n\
-        ands r1, r2\n\
-        orrs r1, r0\n\
-        strb r1, [r4, 0x19]\n\
-    _0805E204:\n\
-        ldrb r2, [r4, 0x19]\n\
-        movs r0, 0xF0\n\
-        ands r0, r2\n\
-        cmp r0, 0\n\
-        bne _0805E21C\n\
-        lsrs r1, r2, 4\n\
-        adds r1, 0x1\n\
-        lsls r1, 4\n\
-        adds r0, r6, 0\n\
-        ands r0, r2\n\
-        orrs r0, r1\n\
-        strb r0, [r4, 0x19]\n\
-    _0805E21C:\n\
-        mov r0, sp\n\
-        ldrb r0, [r0]\n\
-    _0805E220:\n\
-        add sp, 0xC\n\
-        pop {r3-r5}\n\
-        mov r8, r3\n\
-        mov r9, r4\n\
-        mov r10, r5\n\
-        pop {r4-r7}\n\
-        pop {r1}\n\
-        bx r1\n\
-        .align 2, 0\n\
-    _0805E230: .4byte gInitialMovementTypeFacingDirections\n\
-    _0805E234: .4byte gRangedMovementTypes\n\
-    ");
-}
-#endif
 
 static bool8 sub_805E238(struct ObjectEventTemplate *template, u8 var, s16 x, s16 y)
 {
@@ -1904,7 +1681,7 @@ int SpawnSpecialObjectEventParameterized(u8 graphicsId, u8 movementBehavior, u8 
     y -= 7;
     objectEventTemplate.localId = localId;
     objectEventTemplate.graphicsId = graphicsId;
-    objectEventTemplate.unk2 = 0;
+    objectEventTemplate.inConnection = 0;
     objectEventTemplate.x = x;
     objectEventTemplate.y = y;
     objectEventTemplate.elevation = z;
@@ -2159,7 +1936,7 @@ static void sub_805EE3C(u8 objectEventId, s16 x, s16 y)
 #undef i
 
     objectEvent = &gObjectEvents[objectEventId];
-    asm("":::"r5");
+    objectEvent++;objectEvent--; // fakematch
     subspriteTables = NULL;
     graphicsInfo = GetObjectEventGraphicsInfo(objectEvent->graphicsId);
     spriteFrameImage.size = graphicsInfo->size;
@@ -2225,7 +2002,7 @@ static void SetPlayerAvatarObjectEventIdAndObjectId(u8 objectEventId, u8 spriteI
     gPlayerAvatar.objectEventId = objectEventId;
     gPlayerAvatar.spriteId = spriteId;
     gPlayerAvatar.gender = GetPlayerAvatarGenderByGraphicsId(gObjectEvents[objectEventId].graphicsId);
-    SetPlayerAvatarExtraStateTransition(gObjectEvents[objectEventId].graphicsId, 0x20);
+    SetPlayerAvatarExtraStateTransition(gObjectEvents[objectEventId].graphicsId, PLAYER_AVATAR_FLAG_CONTROLLABLE);
 }
 
 void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u8 graphicsId)
@@ -2446,7 +2223,7 @@ void PatchObjectPalette(u16 paletteTag, u8 paletteSlot)
     u8 paletteIndex = FindObjectEventPaletteIndexByTag(paletteTag);
 
     LoadPalette(sObjectEventSpritePalettes[paletteIndex].data, 16 * paletteSlot + 0x100, 0x20);
-    sub_8083598(paletteSlot);
+    ApplyGlobalFieldPaletteTint(paletteSlot);
 }
 
 void PatchObjectPaletteRange(const u16 *paletteTags, u8 minSlot, u8 maxSlot)
@@ -3010,7 +2787,7 @@ static bool8 MovementType_WanderAround_Step5(struct ObjectEvent *objectEvent, st
 
 static bool8 MovementType_WanderAround_Step5Duplicate(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    ObjectEventSetSingleMovement(objectEvent, sprite, sub_8063F2C(objectEvent->movementDirection));
+    ObjectEventSetSingleMovement(objectEvent, sprite, GetWalkSlowestMovementAction(objectEvent->movementDirection));
     objectEvent->singleMovementActive = TRUE;
     sprite->data[1] = 6;
     return TRUE;
@@ -3037,7 +2814,7 @@ bool8 ObjectEventIsTrainerAndCloseToPlayer(struct ObjectEvent *objectEvent)
     s16 minY;
     s16 maxY;
 
-    if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_WATERING))
+    if (!TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_DASH))
     {
         return FALSE;
     }
@@ -4737,7 +4514,7 @@ static void MovementType_MountainDisguise(struct Sprite *sprite)
     UpdateObjectEventCurrentMovement(&gObjectEvents[sprite->data[0]], sprite, MovementType_Disguise_Callback);
 }
 
-static void MovementType_Hidden(struct Sprite *sprite)
+static void MovementType_Buried(struct Sprite *sprite)
 {
     if (!sprite->data[7])
     {
@@ -4746,15 +4523,15 @@ static void MovementType_Hidden(struct Sprite *sprite)
         sprite->oam.priority = 3;
         sprite->data[7]++;
     }
-    UpdateObjectEventCurrentMovement(&gObjectEvents[sprite->data[0]], sprite, MovementType_Hidden_Callback);
+    UpdateObjectEventCurrentMovement(&gObjectEvents[sprite->data[0]], sprite, MovementType_Buried_Callback);
 }
 
-static bool8 MovementType_Hidden_Callback(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+static bool8 MovementType_Buried_Callback(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    return gMovementTypeFuncs_Hidden[sprite->data[1]](objectEvent, sprite);
+    return gMovementTypeFuncs_Buried[sprite->data[1]](objectEvent, sprite);
 }
 
-static bool8 MovementType_Hidden_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
+static bool8 MovementType_Buried_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
     ClearObjectEventMovement(objectEvent, sprite);
     return FALSE;
@@ -5134,19 +4911,19 @@ static bool8 IsCoordOutsideObjectEventMovementRange(struct ObjectEvent *objectEv
     s16 top;
     s16 bottom;
 
-    if (objectEvent->range.as_nybbles.x != 0)
+    if (objectEvent->rangeX != 0)
     {
-        left = objectEvent->initialCoords.x - objectEvent->range.as_nybbles.x;
-        right = objectEvent->initialCoords.x + objectEvent->range.as_nybbles.x;
+        left = objectEvent->initialCoords.x - objectEvent->rangeX;
+        right = objectEvent->initialCoords.x + objectEvent->rangeX;
         if (left > x || right < x)
         {
             return TRUE;
         }
     }
-    if (objectEvent->range.as_nybbles.y != 0)
+    if (objectEvent->rangeY != 0)
     {
-        top = objectEvent->initialCoords.y - objectEvent->range.as_nybbles.y;
-        bottom = objectEvent->initialCoords.y + objectEvent->range.as_nybbles.y;
+        top = objectEvent->initialCoords.y - objectEvent->rangeY;
+        bottom = objectEvent->initialCoords.y + objectEvent->rangeY;
         if (top > y || bottom < y)
         {
             return TRUE;
@@ -5445,7 +5222,7 @@ u8 sub_8063F10(u32 idx)
     return gUnknown_83A64F6[direction];
 }
 
-dirn_to_anim(sub_8063F2C, gUnknown_83A64FB);
+dirn_to_anim(GetWalkSlowestMovementAction, gUnknown_83A64FB);
 dirn_to_anim(GetWalkSlowMovementAction, gUnknown_83A6500);
 dirn_to_anim(GetWalkNormalMovementAction, gUnknown_83A6505);
 dirn_to_anim(GetWalkFastMovementAction, gUnknown_83A650A);
@@ -5455,7 +5232,7 @@ dirn_to_anim(GetWalkFastestMovementAction, gUnknown_83A6519);
 dirn_to_anim(GetSlideMovementAction, gUnknown_83A651E);
 dirn_to_anim(GetPlayerRunMovementAction, gUnknown_83A6523);
 dirn_to_anim(GetPlayerRunSlowMovementAction, gUnknown_83A6528);
-dirn_to_anim(sub_80640E4, gUnknown_83A652D);
+dirn_to_anim(GetSpinMovementAction, gUnknown_83A652D);
 dirn_to_anim(GetJump2MovementAction, gUnknown_83A6532);
 dirn_to_anim(GetJumpInPlaceMovementAction, gUnknown_83A6537);
 dirn_to_anim(GetJumpInPlaceTurnAroundMovementAction, gUnknown_83A653C);
@@ -5551,7 +5328,7 @@ static void ObjectEventSetSingleMovement(struct ObjectEvent *objectEvent, struct
     
     if (gQuestLogPlaybackState == 2)
     {
-        sub_81124EC(objectEvent->localId, objectEvent->mapNum, objectEvent->mapGroup, animId);
+        QuestLogRecordNPCStep(objectEvent->localId, objectEvent->mapNum, objectEvent->mapGroup, animId);
     }
 }
 
@@ -7380,7 +7157,7 @@ static bool8 do_smile_bubble(struct ObjectEvent *objectEvent, struct Sprite *spr
 
 static bool8 MovementAction_RevealTrainer_Step0(struct ObjectEvent *objectEvent, struct Sprite *sprite)
 {
-    if (objectEvent->movementType == MOVEMENT_TYPE_HIDDEN)
+    if (objectEvent->movementType == MOVEMENT_TYPE_BURIED)
     {
         MovementAction_RevealTrainer_RunTrainerSeeFuncList(objectEvent);
         return FALSE;

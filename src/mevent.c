@@ -1,7 +1,6 @@
 #include "global.h"
 #include "gflib.h"
 #include "constants/songs.h"
-#include "constants/species.h"
 #include "easy_chat.h"
 #include "task.h"
 #include "decompress.h"
@@ -177,7 +176,7 @@ static u32 EReaderReceive(u8 * state_p, u16 * receiveDelay)
         case 2:
             if (GetLinkPlayerCount_2() == 2)
             {
-                PlaySE(SE_PINPON);
+                PlaySE(SE_DING_DONG);
                 CheckShouldAdvanceLinkState();
                 *receiveDelay = 0;
                 *state_p = 3;
@@ -443,7 +442,7 @@ static void Task_EReaderComm(u8 taskId)
             if (AdvanceDelayTimerCheckTimeout(&data->stateAdvanceDelay, 120))
             {
                 AddTextPrinterToWindow1(gJPText_NewTrainerHasComeToSevii);
-                PlayFanfare(MUS_FANFA4);
+                PlayFanfare(MUS_OBTAIN_ITEM);
                 data->state = 19;
             }
             break;

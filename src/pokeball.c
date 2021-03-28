@@ -421,7 +421,7 @@ static void Task_DoPokeballSendOutAnim(u8 taskId)
     gSprites[ballSpriteId].oam.affineParam = taskId;
     gTasks[taskId].tOpponentBattler = gBattlerTarget;
     gTasks[taskId].func = TaskDummy;
-    PlaySE(SE_NAGERU);
+    PlaySE(SE_BALL_THROW);
 }
 
 static void SpriteCB_TestBallThrow(struct Sprite *sprite)
@@ -477,7 +477,7 @@ static void sub_804AD00(struct Sprite *sprite)
 {
     sprite->data[5]++;
     if (sprite->data[5] == 11)
-        PlaySE(SE_SUIKOMU);
+        PlaySE(SE_BALL_TRADE);
     
     if (gSprites[gBattlerSpriteIds[sprite->sBattler]].affineAnimEnded)
     {
@@ -528,16 +528,16 @@ static void sub_804ADEC(struct Sprite *sprite)
             switch (sprite->data[3] >> 8)
             {
             case 1:
-                PlaySE(SE_KON);
+                PlaySE(SE_BALL_BOUNCE_1);
                 break;
             case 2:
-                PlaySE(SE_KON2);
+                PlaySE(SE_BALL_BOUNCE_2);
                 break;
             case 3:
-                PlaySE(SE_KON3);
+                PlaySE(SE_BALL_BOUNCE_3);
                 break;
             default:
-                PlaySE(SE_KON4);
+                PlaySE(SE_BALL_BOUNCE_4);
                 break;
             }
         }
@@ -579,7 +579,7 @@ static void sub_804AEE4(struct Sprite *sprite)
         sprite->affineAnimPaused = TRUE;
         StartSpriteAffineAnim(sprite, 1);
         sprite->callback = sub_804AF24;
-        PlaySE(SE_BOWA);
+        PlaySE(SE_BALL);
     }
 }
 
@@ -649,7 +649,7 @@ static void sub_804AF24(struct Sprite *sprite)
             else
                 StartSpriteAffineAnim(sprite, 1);
             
-            PlaySE(SE_BOWA);
+            PlaySE(SE_BALL);
         }
         break;
     }
@@ -775,7 +775,7 @@ static void SpriteCB_ReleaseMonFromBall(struct Sprite *sprite)
 
         species = GetMonData(mon, MON_DATA_SPECIES);
         if ((battlerId == GetBattlerAtPosition(B_POSITION_PLAYER_LEFT) || battlerId == GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT))
-         && IsDoubleBattle() && gBattleSpritesDataPtr->animationData->field_9_x1)
+         && IsDoubleBattle() && gBattleSpritesDataPtr->animationData->healthboxSlideInStarted)
         {
             if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
             {
@@ -788,7 +788,7 @@ static void SpriteCB_ReleaseMonFromBall(struct Sprite *sprite)
             }
         }
 
-        if (!IsDoubleBattle() || !gBattleSpritesDataPtr->animationData->field_9_x1)
+        if (!IsDoubleBattle() || !gBattleSpritesDataPtr->animationData->healthboxSlideInStarted)
             wantedCryCase = 0;
         else if (battlerId == GetBattlerAtPosition(B_POSITION_PLAYER_LEFT) || battlerId == GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT))
             wantedCryCase = 1;
@@ -880,7 +880,7 @@ static void sub_804B5C8(struct Sprite *sprite)
     {
         gDoingBattleAnim = FALSE;
         m4aMPlayAllStop();
-        PlaySE(MUS_FAN6);
+        PlaySE(MUS_CAUGHT_INTRO);
     }
     else if (sprite->data[4] == 315)
     {
@@ -949,7 +949,7 @@ static void SpriteCB_PlayerMonSendOut_2(struct Sprite *sprite)
             sprite->sBattler = sprite->oam.affineParam & 0xFF;
             sprite->data[0] = 0;
 
-            if (IsDoubleBattle() && gBattleSpritesDataPtr->animationData->field_9_x1
+            if (IsDoubleBattle() && gBattleSpritesDataPtr->animationData->healthboxSlideInStarted
              && sprite->sBattler == GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT))
                 sprite->callback = SpriteCB_ReleaseMon2FromBall;
             else
@@ -975,7 +975,7 @@ static void SpriteCB_OpponentMonSendOut(struct Sprite *sprite)
     if (sprite->data[0] > 15)
     {
         sprite->data[0] = 0;
-        if (IsDoubleBattle() && gBattleSpritesDataPtr->animationData->field_9_x1
+        if (IsDoubleBattle() && gBattleSpritesDataPtr->animationData->healthboxSlideInStarted
          && sprite->sBattler == GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT))
             sprite->callback = SpriteCB_ReleaseMon2FromBall;
         else
@@ -1139,7 +1139,7 @@ static void sub_804BCF8(struct Sprite *sprite)
 
     sprite->data[5]++;
     if (sprite->data[5] == 11)
-        PlaySE(SE_SUIKOMU);
+        PlaySE(SE_BALL_TRADE);
     
     r1 = sprite->data[0];
     if (gSprites[r1].affineAnimEnded)
@@ -1167,7 +1167,7 @@ void DestroySpriteAndFreeResources2(struct Sprite *sprite)
     DestroySpriteAndFreeResources(sprite);
 }
 
-void sub_804BD94(u8 battlerId)
+void StartHealthboxSlideIn(u8 battlerId)
 {
     struct Sprite *healthboxSprite = &gSprites[gHealthboxSpriteIds[battlerId]];
 

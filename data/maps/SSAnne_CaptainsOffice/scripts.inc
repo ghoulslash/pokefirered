@@ -1,3 +1,5 @@
+.set LOCALID_CAPTAIN, 1
+
 SSAnne_CaptainsOffice_MapScripts:: @ 8160B39
 	.byte 0
 
@@ -8,14 +10,14 @@ SSAnne_CaptainsOffice_EventScript_Captain:: @ 8160B3A
 	textcolor 3
 	message SSAnne_CaptainsOffice_Text_RubbedCaptainsBack
 	waitmessage
-	playfanfare MUS_ME_ASA
+	playfanfare MUS_HEAL
 	waitfanfare
 	call EventScript_RestorePrevTextColor
 	delay 50
-	applymovement 1, Movement_FacePlayer
+	applymovement LOCALID_CAPTAIN, Movement_FacePlayer
 	waitmovement 0
 	msgbox SSAnne_CaptainsOffice_Text_ThankYouHaveHMForCut
-	giveitem_msg SSAnne_CaptainsOffice_Text_ObtainedHM01FromCaptain, ITEM_HM01, 1, MUS_FAN5
+	giveitem_msg SSAnne_CaptainsOffice_Text_ObtainedHM01FromCaptain, ITEM_HM01, 1, MUS_OBTAIN_KEY_ITEM
 	msgbox SSAnne_CaptainsOffice_Text_ExplainCut
 	setflag FLAG_GOT_HM01
 	setvar VAR_MAP_SCENE_VERMILION_CITY, 1
@@ -26,13 +28,13 @@ SSAnne_CaptainsOffice_EventScript_Captain:: @ 8160B3A
 SSAnne_CaptainsOffice_EventScript_NoRoomForCut:: @ 8160BA0
 	msgbox SSAnne_CaptainsOffice_Text_YouHaveNoRoomForThis
 	closemessage
-	applymovement 1, Movement_FaceOriginalDirection
+	applymovement LOCALID_CAPTAIN, Movement_FaceOriginalDirection
 	waitmovement 0
 	release
 	end
 
 SSAnne_CaptainsOffice_EventScript_AlreadyGotCut:: @ 8160BB5
-	applymovement 1, Movement_FacePlayer
+	applymovement LOCALID_CAPTAIN, Movement_FacePlayer
 	waitmovement 0
 	msgbox SSAnne_CaptainsOffice_Text_SSAnneWillSetSailSoon
 	release

@@ -12,10 +12,8 @@
 #include "script.h"
 #include "task.h"
 #include "constants/field_tasks.h"
-#include "constants/flags.h"
 #include "constants/metatile_labels.h"
 #include "constants/songs.h"
-#include "constants/vars.h"
 
 // TODO: Metatile IDs in this file
 
@@ -199,7 +197,7 @@ static void IcefallCaveIcePerStepCallback(u8 taskId)
             {
                 x = data[4];
                 y = data[5];
-                PlaySE(SE_RU_BARI);
+                PlaySE(SE_ICE_CRACK);
                 MapGridSetMetatileIdAt(x, y, METATILE_SeafoamIslands_CrackedIce);
                 CurrentMapDrawMetatileAt(x, y);
                 data[1] = 1;
@@ -214,7 +212,7 @@ static void IcefallCaveIcePerStepCallback(u8 taskId)
             {
                 x = data[4];
                 y = data[5];
-                PlaySE(SE_RU_GASYAN);
+                PlaySE(SE_ICE_BREAK);
                 MapGridSetMetatileIdAt(x, y, METATILE_SeafoamIslands_IceHole);
                 CurrentMapDrawMetatileAt(x, y);
                 VarSet(VAR_TEMP_1, 1);

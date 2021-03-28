@@ -2,7 +2,6 @@
 #include "random.h"
 #include "overworld.h"
 #include "field_specials.h"
-#include "constants/species.h"
 #include "constants/maps.h"
 #include "constants/region_map_sections.h"
 
@@ -95,7 +94,7 @@ void CreateInitialRoamerMon(void)
     saveRoamer.smart = GetMonData(tmpMon, MON_DATA_SMART);
     saveRoamer.tough = GetMonData(tmpMon, MON_DATA_TOUGH);
     sRoamerLocation[MAP_GRP] = 3;
-    sRoamerLocation[MAP_NUM] = sRoamerLocations[Random() % (ARRAY_COUNT(sRoamerLocations) - 1)][0];
+    sRoamerLocation[MAP_NUM] = sRoamerLocations[Random() % (NELEMS(sRoamerLocations) - 1)][0];
 }
 
 void InitRoamer(void)
@@ -126,7 +125,7 @@ void RoamerMoveToOtherLocationSet(void)
 
     while (1)
     {
-        mapNum = sRoamerLocations[Random() % (ARRAY_COUNT(sRoamerLocations) - 1)][0];
+        mapNum = sRoamerLocations[Random() % (NELEMS(sRoamerLocations) - 1)][0];
         if (sRoamerLocation[MAP_NUM] != mapNum)
         {
             sRoamerLocation[MAP_NUM] = mapNum;
@@ -151,7 +150,7 @@ void RoamerMove(void)
         if (!roamer->active)
             return;
 
-        while (locSet < (ARRAY_COUNT(sRoamerLocations) - 1))
+        while (locSet < (NELEMS(sRoamerLocations) - 1))
         {
             if (sRoamerLocation[MAP_NUM] == sRoamerLocations[locSet][0])
             {

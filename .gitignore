@@ -44,14 +44,13 @@ ld_script_ruby.txt
 ld_script_sapphire.txt
 sound/**/*.bin
 sound/songs/midi/*.s
-src/*.s
 src/data/items.h
 src/data/wild_encounters.h
 tags
 tools/agbcc
 tools/binutils
 types_*.taghl
-!.travis/calcrom/calcrom.pl
+!.github/calcrom/calcrom.pl
 !sound/programmable_wave_samples/*.pcm
 _Deparsed_XSubs.pm
 porymap.project.cfg

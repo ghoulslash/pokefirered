@@ -1,6 +1,5 @@
 #include "global.h"
 #include "gflib.h"
-#include "constants/species.h"
 #include "decompress.h"
 #include "menu.h"
 #include "new_menu_helpers.h"
@@ -318,7 +317,7 @@ static void sub_8145A98(void)
             }
             for (i = 0, r6 = 0; i < 40; i++)
             {
-                if (sMEventScreenData->wonderCard.unk_122[i] != CHAR_SPECIAL_F7)
+                if (sMEventScreenData->wonderCard.unk_122[i] != CHAR_DYNAMIC_PLACEHOLDER)
                 {
                     sMEventScreenData->recordStrings[sMEventScreenData->recordIdx].nameTxt[r6] = sMEventScreenData->wonderCard.unk_122[i];
                     r6++;

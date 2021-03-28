@@ -407,7 +407,7 @@ void AnimTask_LoadSandstormBackground(u8 taskId)
     gBattle_BG1_Y = 0;
     SetGpuReg(REG_OFFSET_BG1HOFS, gBattle_BG1_X);
     SetGpuReg(REG_OFFSET_BG1VOFS, gBattle_BG1_Y);
-    sub_80752A0(&animBg);
+    GetBattleAnimBg1Data(&animBg);
     AnimLoadCompressedBgTilemap(animBg.bgId, gFile_graphics_battle_anims_backgrounds_sandstorm_brew_tilemap);
     AnimLoadCompressedBgGfx(animBg.bgId, gFile_graphics_battle_anims_backgrounds_sandstorm_brew_sheet, animBg.tilesOffset);
     LoadCompressedPalette(gBattleAnimSpritePal_FlyingDirt, animBg.paletteId * 16, 32);
@@ -464,8 +464,8 @@ static void sub_80B490C(u8 taskId)
         }
         break;
     case 3:
-        sub_80752A0(&animBg);
-        sub_8075358(animBg.bgId);
+        GetBattleAnimBg1Data(&animBg);
+        InitBattleAnimBg(animBg.bgId);
         ++gTasks[taskId].data[12];
         break;
     case 4:
@@ -607,7 +607,7 @@ static void sub_80B4D00(u8 taskId)
             task->data[11] = 20;
             ++task->data[0];
         }
-        PlaySE12WithPanning(SE_W029, task->data[13]);
+        PlaySE12WithPanning(SE_M_HEADBUTT, task->data[13]);
         break;
     case 1:
         if (--task->data[11] == 0)
@@ -636,7 +636,7 @@ static void sub_80B4D00(u8 taskId)
             task->data[9] = 0;
             sub_80B4E70(task);
             task->data[13] += task->data[14];
-            PlaySE12WithPanning(SE_W091, task->data[13]);
+            PlaySE12WithPanning(SE_M_DIG, task->data[13]);
         }
         if (--task->data[8] == 0)
         {
@@ -795,14 +795,14 @@ void AnimTask_MoveSeismicTossBg(u8 taskId)
 {
     if (gTasks[taskId].data[0] == 0)
     {
-        sub_8075458(0);
+        ToggleBg3Mode(0);
         gTasks[taskId].data[1] = 200;
     }
     gBattle_BG3_Y += gTasks[taskId].data[1] / 10;
     gTasks[taskId].data[1] -= 3;
     if (gTasks[taskId].data[0] == 120)
     {
-        sub_8075458(1);
+        ToggleBg3Mode(1);
         DestroyAnimVisualTask(taskId);
     }
     ++gTasks[taskId].data[0];
@@ -812,7 +812,7 @@ void AnimTask_SeismicTossBgAccelerateDownAtEnd(u8 taskId)
 {
     if (gTasks[taskId].data[0] == 0)
     {
-        sub_8075458(0);
+        ToggleBg3Mode(0);
         ++gTasks[taskId].data[0];
         gTasks[taskId].data[2] = gBattle_BG3_Y;
     }
@@ -822,7 +822,7 @@ void AnimTask_SeismicTossBgAccelerateDownAtEnd(u8 taskId)
     if (gBattleAnimArgs[7] == 0xFFF)
     {
         gBattle_BG3_Y = 0;
-        sub_8075458(1);
+        ToggleBg3Mode(1);
         DestroyAnimVisualTask(taskId);
     }
 }

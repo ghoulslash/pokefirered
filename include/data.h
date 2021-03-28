@@ -2,7 +2,6 @@
 #define GUARD_DATA_H
 
 #include "global.h"
-#include "constants/species.h"
 
 #define SPECIES_SHINY_TAG 500
 #define TRAINER_ENCOUNTER_MUSIC(trainer)((gTrainers[trainer].encounterMusic_gender & 0x7F))
@@ -28,7 +27,7 @@ extern const struct MonCoords gMonFrontPicCoords[];
 extern const struct CompressedSpriteSheet gMonFrontPicTable[];
 extern const struct MonCoords gMonBackPicCoords[];
 extern const struct CompressedSpriteSheet gMonBackPicTable[];
-extern struct CompressedSpritePalette gMonPaletteTable[];
+extern const struct CompressedSpritePalette gMonPaletteTable[];
 extern const struct CompressedSpritePalette gMonShinyPaletteTable[];
 extern const union AnimCmd *const *const gTrainerFrontAnimsPtrTable[];
 extern const struct MonCoords gTrainerFrontPicCoords[];
@@ -49,12 +48,12 @@ extern const u8 *const gBattleAnims_Special[];
 extern const struct OamData gUnknown_824F010;
 extern const struct OamData gUnknown_824F018;
 extern const union AnimCmd *const gSpriteAnimTable_82349BC[];
-extern const union AffineAnimCmd *const gSpriteAffineAnimTable_82348C8[];
-extern const union AffineAnimCmd *const gSpriteAffineAnimTable_8234944[];
-extern const struct SpriteFrameImage gUnknown_8234698[];
-extern const struct SpriteFrameImage gUnknown_82346B8[];
-extern const struct SpriteFrameImage gUnknown_82346D8[];
-extern const struct SpriteFrameImage gUnknown_82346F8[];
+extern const union AffineAnimCmd *const gSpriteAffineAnimTable_BattlerPlayer[];
+extern const union AffineAnimCmd *const gSpriteAffineAnimTable_BattlerOpponent[];
+extern const struct SpriteFrameImage gSpriteImages_BattlerPlayerLeft[];
+extern const struct SpriteFrameImage gSpriteImages_BattlerOpponentLeft[];
+extern const struct SpriteFrameImage gSpriteImages_BattlerPlayerRight[];
+extern const struct SpriteFrameImage gSpriteImages_BattlerOpponentRight[];
 extern const struct SpriteFrameImage gTrainerBackPicTable_Red[];
 extern const struct SpriteFrameImage gTrainerBackPicTable_Leaf[];
 extern const struct SpriteFrameImage gTrainerBackPicTable_Pokedude[];

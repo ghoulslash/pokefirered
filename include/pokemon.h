@@ -4,6 +4,7 @@
 #include "global.h"
 #include "sprite.h"
 #include "constants/pokemon.h"
+#include "pokemon_storage_system.h"
 
 struct PokemonSubstruct0
 {
@@ -65,15 +66,15 @@ struct PokemonSubstruct3
  /* 0x0A */ u32 victoryRibbon:1;
  /* 0x0A */ u32 artistRibbon:1;
  /* 0x0A */ u32 effortRibbon:1;
- /* 0x0A */ u32 giftRibbon1:1;
- /* 0x0A */ u32 giftRibbon2:1;
- /* 0x0A */ u32 giftRibbon3:1;
- /* 0x0A */ u32 giftRibbon4:1;
- /* 0x0B */ u32 giftRibbon5:1;
- /* 0x0B */ u32 giftRibbon6:1;
- /* 0x0B */ u32 giftRibbon7:1;
- /* 0x0B */ u32 fatefulEncounter:4;
- /* 0x0B */ u32 obedient:1;
+ /* 0x0A */ u32 marineRibbon:1; // never distributed
+ /* 0x0A */ u32 landRibbon:1; // never distributed
+ /* 0x0A */ u32 skyRibbon:1; // never distributed
+ /* 0x0A */ u32 countryRibbon:1; // distributed during Pokémon Festa '04 and '05 to tournament winners
+ /* 0x0B */ u32 nationalRibbon:1;
+ /* 0x0B */ u32 earthRibbon:1;
+ /* 0x0B */ u32 worldRibbon:1; // distributed during Pokémon Festa '04 and '05 to tournament winners
+ /* 0x0B */ u32 filler:4;
+ /* 0x0B */ u32 eventLegal:1; // controls Mew & Deoxys obedience; if set, Pokémon is a fateful encounter in FRLG & Gen 4+ summary screens; set for in-game event island legendaries, some distributed events, and Pokémon from XD: Gale of Darkness.
 };
 
 union PokemonSubstruct
@@ -125,9 +126,9 @@ struct Pokemon
 struct PokemonStorage
 {
     /*0x0000*/ u8 currentBox;
-    /*0x0001*/ struct BoxPokemon boxes[14][30];
-    /*0x8344*/ u8 boxNames[14][BOX_NAME_LENGTH + 1];
-    /*0x83C2*/ u8 boxWallpapers[14];
+    /*0x0001*/ struct BoxPokemon boxes[TOTAL_BOXES_COUNT][IN_BOX_COUNT];
+    /*0x8344*/ u8 boxNames[TOTAL_BOXES_COUNT][BOX_NAME_LENGTH + 1];
+    /*0x83C2*/ u8 boxWallpapers[TOTAL_BOXES_COUNT];
 };
 
 struct BattleTowerPokemon
@@ -326,7 +327,7 @@ extern const u32 gExperienceTables[][MAX_LEVEL + 1];
 extern const u16 *const gLevelUpLearnsets[];
 extern const u8 gFacilityClassToPicIndex[];
 extern const u8 gFacilityClassToTrainerClass[];
-extern const struct SpriteTemplate gUnknown_825DEF0[];
+extern const struct SpriteTemplate gSpriteTemplates_Battlers[];
 extern const u8 gPPUpGetMask[];
 
 void ZeroBoxMonData(struct BoxPokemon *boxMon);
@@ -341,7 +342,7 @@ void CreateMaleMon(struct Pokemon *mon, u16 species, u8 level);
 void CreateMonWithIVsPersonality(struct Pokemon *mon, u16 species, u8 level, u32 ivs, u32 personality);
 void CreateMonWithEVSpread(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u8 evSpread);
 void CreateBattleTowerMon(struct Pokemon *mon, struct BattleTowerPokemon *src);
-void sub_803E23C(struct Pokemon *mon, struct BattleTowerPokemon *dest);
+void ConvertPokemonToBattleTowerPokemon(struct Pokemon *mon, struct BattleTowerPokemon *dest);
 void CalculateMonStats(struct Pokemon *mon);
 void BoxMonToMon(struct BoxPokemon *src, struct Pokemon *dest);
 u8 GetLevelFromBoxMonExp(struct BoxPokemon *boxMon);
@@ -406,7 +407,7 @@ u16 NationalPokedexNumToSpecies(u16 nationalNum);
 u16 SpeciesToNationalPokedexNum(u16 species);
 u16 HoennToNationalOrder(u16 hoennNum);
 u16 SpeciesToCryId(u16 species);
-void DrawSpindaSpots(u16 species, u32 personality, u8 *dest, u8 a4);
+void DrawSpindaSpots(u16 species, u32 personality, u8 *dest, bool8 isFrontPic);
 void EvolutionRenameMon(struct Pokemon *mon, u16 oldSpecies, u16 newSpecies);
 bool8 GetPlayerFlankId(void);
 bool16 GetLinkTrainerFlankId(u8 linkPlayerId);
@@ -445,11 +446,11 @@ bool8 IsMonShiny(struct Pokemon *mon);
 u8 *GetTrainerPartnerName(void);
 u8 GetPlayerPartyHighestLevel(void);
 u16 FacilityClassToPicIndex(u16 facilityClass);
-bool8 sub_804455C(u8 caseId, u8 battlerId);
+bool8 ShouldIgnoreDeoxysForm(u8 caseId, u8 battlerId);
 void SetDeoxysStats(void);
-u16 sub_80447AC(void);
-u16 sub_80447F0(void);
-void CreateObedientEnemyMon(void);
+u16 GetUnionRoomTrainerPic(void);
+u16 GetUnionRoomTrainerClass(void);
+void CreateEventLegalEnemyMon(void);
 void HandleSetPokedexFlag(u16 nationalNum, u8 caseId, u32 personality);
 bool8 CheckBattleTypeGhost(struct Pokemon *mon, u8 bank);
 struct OakSpeechNidoranFStruct *OakSpeechNidoranFSetup(u8 battlePosition, bool8 enable);
